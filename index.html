@@ -325,42 +325,30 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   // ---- build a real PDF (text + signature images) and share it ----
   function pdfEscape(t){return t.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[^\x20-\x7e]/g,' ');}
   function collectData(){
-    var tabNames={fall:'FALL PROTECTION PLAN',hot:'HOT WORK PERMIT',silica:'SILICA EXPOSURE CONTROL PLAN'};
+    var tabNames={fall:'Site-Specific Fall Protection Plan',hot:'Hot Work Permit',silica:'Silica Exposure Control Plan'};
     var active=document.querySelector('.tabs button.active').dataset.tab;
     var co=contractorSel.value==='other'?otherInput.value:contractorSel.value;
-    var lines=[];
-    lines.push(['h','Whistler 2020 Development Corp']);
-    lines.push(['h',tabNames[active]]);
-    lines.push(['t','Date: '+new Date().toLocaleString()]);
-    lines.push(['t','Site: '+document.getElementById('site').value]);
-    lines.push(['t','Company: '+co]);
-    lines.push(['t','Work: '+document.getElementById('desc').value]);
-    lines.push(['t','Supervisor: '+document.getElementById('supervisor').value]);
-    if(active==='fall') lines.push(['t','Working height: '+document.getElementById('fp-height').value]);
-    if(active==='hot'){
-      lines.push(['t','Type of hot work: '+document.getElementById('hw-type').value]);
-    }
+    var rows=[
+      ['Site',document.getElementById('site').value],
+      ['Company',co],
+      ['Work',document.getElementById('desc').value],
+      ['Supervisor',document.getElementById('supervisor').value]
+    ];
+    if(active==='fall') rows.push(['Working height',document.getElementById('fp-height').value]);
+    if(active==='hot') rows.push(['Type of hot work',document.getElementById('hw-type').value]);
     if(active==='silica'){
-      lines.push(['t','Task: '+document.getElementById('si-task').value]);
-      lines.push(['t','Respirator: '+document.getElementById('si-resp').value]);
+      rows.push(['Task',document.getElementById('si-task').value]);
+      rows.push(['Respirator',document.getElementById('si-resp').value]);
     }
-    lines.push(['t','']);
     var form=document.getElementById('form-'+active);
+    var checks=[];
     form.querySelectorAll('.chk').forEach(function(row){
-      var on=row.querySelector('input').checked;
-      lines.push(['t','['+(on?'X':' ')+'] '+row.querySelector('span').textContent]);
+      checks.push([row.querySelector('input').checked, row.querySelector('span').textContent]);
     });
-    lines.push(['t','']);
+    var statements=[];
     form.querySelectorAll('.statement').forEach(function(st){
       var strong=st.querySelector('strong');
-      lines.push(['b',strong.textContent+':']);
-      var body=st.textContent.replace(strong.textContent,'').trim();
-      var acc='';
-      body.split(/\s+/).forEach(function(w){
-        if((acc+' '+w).trim().length>95){lines.push(['s',acc]);acc=w;}
-        else acc=(acc+' '+w).trim();
-      });
-      if(acc) lines.push(['s',acc]);
+      statements.push([strong.textContent, st.textContent.replace(strong.textContent,'').trim()]);
     });
     var sigsArr=[];
     document.querySelectorAll('#sigs .sig-block').forEach(function(bl){
@@ -370,43 +358,89 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
       var tc=t.getContext('2d'); tc.fillStyle='#fff'; tc.fillRect(0,0,t.width,t.height); tc.drawImage(c,0,0);
       var blank=document.createElement('canvas'); blank.width=c.width; blank.height=c.height;
       var bc=blank.getContext('2d'); bc.fillStyle='#fff'; bc.fillRect(0,0,blank.width,blank.height);
-      var drawn = t.toDataURL()!==blank.toDataURL();
-      if(!drawn && !name) return;
+      if(t.toDataURL()===blank.toDataURL() && !name) return;
       sigsArr.push({name:name||'(no name)', jpeg:t.toDataURL('image/jpeg',0.85), pw:c.width, ph:c.height});
     });
-    return {lines:lines, sigs:sigsArr,
+    return {title:tabNames[active], rows:rows, checks:checks, statements:statements, sigs:sigsArr,
+      dateStr:new Date().toDateString()+'  '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
       fname:tabNames[active].toLowerCase().replace(/[^a-z]+/g,'-')+'-'+document.getElementById('site').value.split(' ')[0]+'-'+new Date().toISOString().slice(0,10)+'.pdf'};
   }
   function buildPdf(d){
-    var W=612,H=792,M=46;
-    var content='', y=H-M;
-    function text(t,size,bold){
-      content+='BT /'+(bold?'F2':'F1')+' '+size+' Tf '+M+' '+(y-size)+' Td ('+pdfEscape(t)+') Tj ET\n';
-      y-=size*1.45;
+    var W=612,H=792,M=48;
+    var BLUE='0 0.239 0.322', GREEN='0.588 0.776 0.11', GREY='0.42 0.5 0.53', DARK='0.09 0.2 0.24';
+    var c='', y;
+    function esc(t){return pdfEscape(t);}
+    function txt(t,size,x,yy,color,bold){
+      c+=color+' rg BT /'+(bold?'F2':'F1')+' '+size+' Tf '+x+' '+yy+' Td ('+esc(t)+') Tj ET\n';
     }
-    d.lines.forEach(function(L){
-      if(L[0]==='h'){text(L[1],14,true);y-=2;}
-      else if(L[0]==='b'){y-=4;text(L[1],9,true);}
-      else if(L[0]==='s'){text(L[1],9,false);}
-      else text(L[1],10,false);
+    function wrap(t,max){
+      var out=[],acc='';
+      t.split(/\s+/).forEach(function(w){
+        if((acc+' '+w).trim().length>max){out.push(acc);acc=w;}
+        else acc=(acc+' '+w).trim();
+      });
+      if(acc) out.push(acc);
+      return out;
+    }
+    // header band
+    c+=BLUE+' rg 0 '+(H-86)+' '+W+' 86 re f\n';
+    c+=GREEN+' rg 0 '+(H-90)+' '+W+' 4 re f\n';
+    txt('WHISTLER 2020 DEVELOPMENT CORP',10,M,H-32,'1 1 1',true);
+    txt(d.title,16,M,H-54,'1 1 1',true);
+    txt(d.dateStr,9,M,H-72,'0.75 0.85 0.88',false);
+    y=H-116;
+    // info rows: grey label / dark value
+    d.rows.forEach(function(r){
+      txt(r[0].toUpperCase(),7,M,y,GREY,true);
+      wrap(r[1]||'-',80).forEach(function(ln,i){
+        txt(ln,10.5,M+95,y-(i*13),DARK,false);
+      });
+      y-=Math.max(1,wrap(r[1]||'-',80).length)*13+5;
     });
-    y-=10; text('SIGNATURES',11,true); y-=4;
+    y-=6;
+    // checklist
+    txt('CHECKLIST',9,M,y,BLUE,true); y-=16;
+    d.checks.forEach(function(ck){
+      var lines=wrap(ck[1],86);
+      if(ck[0]){ c+=GREEN+' rg '+M+' '+(y-2)+' 9 9 re f\n'; }
+      else { c+='0.7 0.75 0.77 RG 0.8 w '+M+' '+(y-2)+' 9 9 re S\n'; }
+      lines.forEach(function(ln,i){ txt(ln,9.5,M+16,y-(i*12),DARK,false); });
+      y-=lines.length*12+6;
+    });
+    y-=6;
+    // statements with green side rule
+    d.statements.forEach(function(st){
+      var lines=wrap(st[1],92);
+      var blockH=14+lines.length*11;
+      c+=GREEN+' rg '+M+' '+(y-blockH+8)+' 2 '+blockH+' re f\n';
+      txt(st[0].toUpperCase(),8,M+10,y,BLUE,true); y-=13;
+      lines.forEach(function(ln){ txt(ln,8.5,M+10,y,GREY,false); y-=11; });
+      y-=10;
+    });
+    // signatures
+    txt('SIGNATURES',9,M,y,BLUE,true); y-=14;
     var imgs=[];
+    var x=M, colW=250;
     d.sigs.forEach(function(sg,i){
-      var iw=200, ih=62;
-      if(y-ih-20<M) return; // page full; extra signatures beyond space are skipped
-      content+='q '+iw+' 0 0 '+ih+' '+M+' '+(y-ih)+' cm /Im'+i+' Do Q\n';
-      y-=ih+4;
-      text(sg.name,9,false); y-=6;
+      var iw=230, ih=68;
+      if(x+iw>W-M){ x=M; y-=ih+30; }
+      if(y-ih<40) return;
+      c+='q '+iw+' 0 0 '+ih+' '+x+' '+(y-ih)+' cm /Im'+imgs.length+' Do Q\n';
+      c+='0.7 0.75 0.77 RG 0.8 w '+x+' '+(y-ih)+' '+iw+' '+ih+' re S\n';
+      txt(sg.name,9,x,y-ih-12,DARK,false);
       imgs.push({bin:atob(sg.jpeg.split(',')[1]), pw:sg.pw, ph:sg.ph});
+      x+=colW;
     });
+    // footer
+    c+=GREEN+' rg '+M+' 30 '+(W-2*M)+' 1.5 re f\n';
+    txt('safety@wdc2020corp.com',7.5,M,18,GREY,false);
     var objs=[];
     objs.push('<< /Type /Catalog /Pages 2 0 R >>');
     objs.push('<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
     var xo='';
     imgs.forEach(function(_,i){xo+='/Im'+i+' '+(7+i)+' 0 R ';});
     objs.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+W+' '+H+'] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> /XObject << '+xo+'>> >> /Contents 4 0 R >>');
-    objs.push('<< /Length '+content.length+' >>\nstream\n'+content+'endstream');
+    objs.push('<< /Length '+c.length+' >>\nstream\n'+c+'endstream');
     objs.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
     objs.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>');
     imgs.forEach(function(im){
@@ -421,19 +455,6 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     var bytes=new Uint8Array(out.length);
     for(var i=0;i<out.length;i++) bytes[i]=out.charCodeAt(i)&0xff;
     return bytes;
-  }
-  function showPdfOverlay(blob,fname){
-    var url=URL.createObjectURL(blob);
-    var ov=document.createElement('div');
-    ov.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:99;display:flex;flex-direction:column';
-    ov.innerHTML='<div style="padding:10px 16px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line)">'+
-      '<strong style="flex:1;font-size:.9rem">'+fname+'</strong>'+
-      '<a href="'+url+'" download="'+fname+'" target="_blank" style="color:var(--accent);font-weight:700;text-decoration:none">Open / Download</a>'+
-      '<button id="ovClose" style="padding:8px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px">Close</button></div>'+
-      '<iframe src="'+url+'" style="flex:1;border:none;width:100%"></iframe>'+
-      '<div style="padding:8px 16px;font-size:.8rem;color:var(--muted)">Use your browser menu (Share / Print) to send this PDF to safety@wdc2020corp.com</div>';
-    document.body.appendChild(ov);
-    ov.querySelector('#ovClose').addEventListener('click',function(){ov.remove();URL.revokeObjectURL(url);});
   }
   document.getElementById('btnEmail').addEventListener('click',function(){
     var d=collectData();
