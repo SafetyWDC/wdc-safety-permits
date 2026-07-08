@@ -173,9 +173,6 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   <div class="chk"><input type="checkbox"><span>No flammable liquids, gases or dust in the area</span></div>
   <div class="chk"><input type="checkbox"><span>Fire watch assigned during work + 60 minutes after</span></div>
 
-  <label class="f">Fire watch name</label>
-  <input type="text" id="hw-firewatch" placeholder="Name">
-
   <div class="statement"><strong>Rules</strong>
   Stop work if conditions change. Fire watch stays at least 60 minutes after hot work ends (CSA W117.2, required by OHS 12.112) and checks the area for smoke, heat or embers. Recently welded or cut metal is marked “HOT” or guarded (OHS 12.125). In case of fire: sound alarm, call 911, use extinguisher only if safe.</div>
 </div>
@@ -307,7 +304,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   });
 
   // restore fields
-  var FIELDS=['site','contractor','desc','supervisor','hw-firewatch','hw-type','fp-height','si-task','si-resp'];
+  var FIELDS=['site','contractor','desc','supervisor','hw-type','fp-height','si-task','si-resp'];
   FIELDS.forEach(function(id){
     var el=document.getElementById(id);
     if(el && saved[id]!=null) el.value=saved[id];
@@ -348,7 +345,6 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     if(active==='fall') lines.push(['t','Working height: '+document.getElementById('fp-height').value]);
     if(active==='hot'){
       lines.push(['t','Type of hot work: '+document.getElementById('hw-type').value]);
-      lines.push(['t','Fire watch: '+document.getElementById('hw-firewatch').value]);
     }
     if(active==='silica'){
       lines.push(['t','Task: '+document.getElementById('si-task').value]);
