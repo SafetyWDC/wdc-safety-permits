@@ -119,7 +119,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 <section class="form" id="form-fall">
 <div class="card">
   <h2>Site-Specific Fall Protection Plan</h2>
-  <p class="sub">WorkSafeBC OHS Reg. Part 11 — fall protection required at 3 m (10 ft); written plan required at 7.5 m (25 ft) where there are no permanent guardrails (11.2, 11.3).</p>
+  <p class="sub">WorkSafeBC OHS Reg. Part 11. Required at 3 m (10 ft); written plan at 7.5 m (25 ft).</p>
 
   <label class="f">Working height</label>
   <select id="fp-height">
@@ -136,19 +136,16 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 
   <label class="f">Fall protection system used (check all)</label>
   <div class="chk"><input type="checkbox"><span>Guardrails</span></div>
-  <div class="chk"><input type="checkbox"><span>Full-body harness + lanyard, tied to an anchor rated at least 3.5 kN (800 lb) per worker, or 4x the worker’s weight (OHS 11.6)</span></div>
+  <div class="chk"><input type="checkbox"><span>Full-body harness + lanyard on an approved anchor (3.5 kN / 800 lb per worker)</span></div>
   <div class="chk"><input type="checkbox"><span>Self-retracting lifeline (SRL)</span></div>
   <div class="chk"><input type="checkbox"><span>Control zone (min. 2 m from edge) with safety monitor</span></div>
   <div class="chk"><input type="checkbox"><span>Covers over openings, secured and marked</span></div>
 
-  <div class="statement"><strong>Equipment check</strong>
-  All harnesses, lanyards and anchors are inspected by a qualified person before use on each shift. Damaged equipment is removed from service immediately.</div>
+  <div class="statement"><strong>Rescue</strong>
+  If a worker falls and is suspended: call 911 and the first aid attendant, keep the worker talking, rescue promptly with equipment on site if safe. Never leave them alone.</div>
 
-  <div class="statement"><strong>Rescue procedure</strong>
-  If a worker falls and is suspended: call 911, keep the worker talking, rescue promptly using a ladder or equipment on site if safe to do so. Never leave a suspended worker alone. First aid attendant on site is notified immediately.</div>
-
-  <div class="statement"><strong>Training</strong>
-  All workers signing below have been trained in the fall protection system used today and understand this plan before work starts.</div>
+  <div class="statement"><strong>Equipment &amp; training</strong>
+  Equipment inspected before use each shift. Workers signing below are trained in the system used today.</div>
 </div>
 </section>
 
@@ -168,13 +165,13 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 
   <label class="f">Precautions — all must be checked before starting</label>
   <div class="chk"><input type="checkbox"><span>Combustibles removed or covered within 11 m (35 ft)</span></div>
-  <div class="chk"><input type="checkbox"><span>Fire extinguisher (suitable type, min. 2A:10BC) immediately available at the work area (OHS 12.126)</span></div>
+  <div class="chk"><input type="checkbox"><span>Fire extinguisher at the work area</span></div>
   <div class="chk"><input type="checkbox"><span>Floor/wall openings near the work covered or protected</span></div>
   <div class="chk"><input type="checkbox"><span>No flammable liquids, gases or dust in the area</span></div>
   <div class="chk"><input type="checkbox"><span>Fire watch assigned during work + 60 minutes after</span></div>
 
   <div class="statement"><strong>Rules</strong>
-  Stop work if conditions change. Fire watch stays at least 60 minutes after hot work ends (CSA W117.2, required by OHS 12.112) and checks the area for smoke, heat or embers. Recently welded or cut metal is marked “HOT” or guarded (OHS 12.125). In case of fire: sound alarm, call 911, use extinguisher only if safe.</div>
+  Stop work if conditions change. Fire watch checks for smoke, heat or embers during work and 60 minutes after. Mark hot metal “HOT”. Fire: sound alarm, call 911, use extinguisher only if safe.</div>
 </div>
 </section>
 
@@ -182,7 +179,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 <section class="form hidden" id="form-silica">
 <div class="card">
   <h2>Silica Exposure Control Plan</h2>
-  <p class="sub">WorkSafeBC OHS Reg. 5.54 — cutting, grinding or drilling concrete, masonry or rock creates silica dust that can cause lung disease.</p>
+  <p class="sub">WorkSafeBC OHS Reg. 5.54. Silica dust from concrete, masonry or rock can cause lung disease.</p>
 
   <label class="f">Task creating silica dust</label>
   <select id="si-task">
@@ -206,18 +203,15 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     <option>Full-face respirator with P100</option>
   </select>
 
-  <div class="statement"><strong>Worker responsibilities</strong>
-  Workers are trained on silica hazards, use the controls above at all times, are clean-shaven where the respirator seals, and wash hands and face before eating or drinking.</div>
-
-  <div class="statement"><strong>Supervisor responsibilities</strong>
-  Supervisor makes sure water/vacuum controls work before starting, respirators are worn correctly, and stops the task if visible dust escapes the controls.</div>
+  <div class="statement"><strong>Rules</strong>
+  Controls checked and used at all times, respirators worn correctly (clean-shaven seal). Stop the task if visible dust escapes. Wash hands before eating or drinking.</div>
 </div>
 </section>
 
 <!-- ================= SIGNATURES ================= -->
 <div class="card" id="sigcard">
   <h2>Signatures</h2>
-  <p class="sub">By signing, each person confirms they read and understood this plan/permit and will follow it today.</p>
+  <p class="sub">Each person signing confirms they understood this plan and will follow it today.</p>
   <div id="sigs"></div>
   <button class="addsig" id="addSig">+ Add another signature</button>
 </div>
