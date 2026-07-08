@@ -47,7 +47,7 @@ textarea{min-height:70px}
 .statement strong{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
 
 .sig-block{margin-top:10px}
-canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8px;background:var(--field);touch-action:none;display:block}
+canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8px;background:#ffffff;touch-action:none;display:block}
 .sig-row{display:flex;gap:8px;margin-top:6px}
 .sig-row input{flex:1}
 .sig-row button{padding:8px 12px;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:8px;font-size:.8rem;cursor:pointer}
@@ -259,8 +259,8 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
       var r=c.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
       var img=c.width?c.toDataURL():null;
       c.width=r.width*dpr; c.height=120*dpr; ctx.scale(dpr,dpr);
-      ctx.lineWidth=2; ctx.lineCap='round';
-      ctx.strokeStyle=getComputedStyle(document.body).color;
+      ctx.lineWidth=3; ctx.lineCap='round'; ctx.lineJoin='round';
+      ctx.strokeStyle='#003D52';
     }
     resize();
     function pos(e){
