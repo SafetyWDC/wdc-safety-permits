@@ -188,7 +188,9 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     <option>Grinding concrete surfaces</option>
     <option>Jackhammering / chipping</option>
     <option>Sweeping / cleanup of concrete dust</option>
+    <option value="other">Other — type below</option>
   </select>
+  <input type="text" id="si-taskOther" class="hidden" placeholder="Describe the task" style="margin-top:8px">
 
   <label class="f">Dust controls used (check all)</label>
   <div class="chk"><input type="checkbox"><span>Water applied at the cutting point (wet method)</span></div>
@@ -241,6 +243,10 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 
   // contractor other
   var cSel=document.getElementById('contractor');
+  var siSel=document.getElementById('si-task');
+  function siOtherVis(){ document.getElementById('si-taskOther').classList.toggle('hidden',siSel.value!=='other'); }
+  siSel.addEventListener('change',siOtherVis);
+  setTimeout(siOtherVis,0);
   cSel.addEventListener('change',function(){
     document.getElementById('contractorOther').classList.toggle('hidden',this.value!=='other');
   });
@@ -298,7 +304,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   });
 
   // restore fields
-  var FIELDS=['site','contractor','desc','supervisor','hw-type','fp-height','si-task','si-resp'];
+  var FIELDS=['site','contractor','desc','supervisor','hw-type','fp-height','si-task','si-taskOther','si-resp'];
   FIELDS.forEach(function(id){
     var el=document.getElementById(id);
     if(el && saved[id]!=null) el.value=saved[id];
@@ -337,7 +343,8 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     if(active==='fall') rows.push(['Working height',document.getElementById('fp-height').value]);
     if(active==='hot') rows.push(['Type of hot work',document.getElementById('hw-type').value]);
     if(active==='silica'){
-      rows.push(['Task',document.getElementById('si-task').value]);
+      var siVal=document.getElementById('si-task').value;
+      rows.push(['Task',siVal==='other'?document.getElementById('si-taskOther').value:siVal]);
       rows.push(['Respirator',document.getElementById('si-resp').value]);
     }
     var form=document.getElementById('form-'+active);
