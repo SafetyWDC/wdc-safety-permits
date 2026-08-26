@@ -61,11 +61,32 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 .hidden{display:none}
 
 @media print{
+  @page{margin:10mm}
   .tabs,.printbar,.addsig,.sig-row button{display:none !important}
-  body{background:#fff;color:#000;padding:0}
-  .card{border:1px solid #999;break-inside:avoid}
-  section.form.hidden{display:none}
+  body{background:#fff;color:#000;padding:0;font-size:8.5pt;line-height:1.25}
   :root{--card:#fff;--field:#fff;--ink:#000;--muted:#444;--line:#999;--bg:#fff}
+  section.form.hidden{display:none}
+  header.top{padding:0 0 2mm}
+  header.top h1{font-size:11pt}
+  header.top p{font-size:7.5pt}
+  .wrap{max-width:none;padding:0}
+  .card{border:none;border-top:1px solid #999;border-radius:0;padding:2mm 0;margin-bottom:0}
+  .card h2{font-size:9.5pt;margin:0}
+  .card .sub{font-size:7pt;margin:0 0 1mm}
+  label.f{font-size:6.5pt;margin:1.5mm 0 0.5mm}
+  select,input[type=text],textarea{padding:1mm;font-size:8.5pt;border:none;border-bottom:1px solid #999;border-radius:0;min-height:0}
+  textarea{min-height:0;height:auto}
+  .chk{padding:0.8mm 0;font-size:8pt;border-bottom:none}
+  .chk input{width:3.2mm;height:3.2mm}
+  .statement{font-size:7.5pt;padding:1mm 2mm;margin:1mm 0}
+  .statement strong{font-size:6.5pt}
+  .meta{font-size:7.5pt}
+  #sigcard .sub{display:none}
+  #sigs{display:flex;flex-wrap:wrap;gap:2mm}
+  .sig-block{width:48%;margin-top:0}
+  canvas.sig{height:16mm}
+  .sig-row{margin-top:0.5mm}
+  .sig-row input{font-size:8pt}
 }
 </style>
 </head>
@@ -164,15 +185,32 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     <option>Soldering / brazing</option>
   </select>
 
+  <label class="f">Hot work area / location (specific — e.g. "Level 4, Unit 409")</label>
+  <input type="text" id="hw-area" placeholder="Building, level, unit">
+
+  <label class="f">Name(s) of person(s) doing the hot work</label>
+  <input type="text" id="hw-workers" placeholder="Full name(s)">
+
+  <label class="f">Fire watch — name of person assigned</label>
+  <input type="text" id="hw-firewatch" placeholder="Full name">
+
   <label class="f">Precautions — all must be checked before starting</label>
   <div class="chk"><input type="checkbox"><span>Combustibles removed or covered within 11 m (35 ft)</span></div>
-  <div class="chk"><input type="checkbox"><span>Fire extinguisher at the work area</span></div>
+  <div class="chk"><input type="checkbox"><span>Fire extinguisher at the work area (min. 1 ABC 20lb within 20 ft)</span></div>
   <div class="chk"><input type="checkbox"><span>Floor/wall openings near the work covered or protected</span></div>
   <div class="chk"><input type="checkbox"><span>No flammable liquids, gases or dust in the area</span></div>
-  <div class="chk"><input type="checkbox"><span>Fire watch assigned during work + 60 minutes after</span></div>
+  <div class="chk"><input type="checkbox"><span>Worker(s) doing hot work are site-oriented and hot-work trained</span></div>
+  <div class="chk"><input type="checkbox"><span>Continuous fire watch assigned during work AND for 2 hours after work stops — including through breaks and lunch (fire watch never left uncovered)</span></div>
+
+  <div id="hw-torch-only" class="hidden">
+    <label class="f">Torch-specific precautions</label>
+    <div class="chk"><input type="checkbox"><span>Propane cylinder secured upright, kept 3 m (10 ft) from open flame</span></div>
+    <div class="chk"><input type="checkbox"><span>Torch, hose and connections inspected — no leaks or damage; torch stand on hand</span></div>
+    <div class="chk"><input type="checkbox"><span>Worker(s) are torch-safe certified (RCABC or equivalent)</span></div>
+  </div>
 
   <div class="statement"><strong>Rules</strong>
-  Stop work if conditions change. Fire watch checks for smoke, heat or embers during work and 60 minutes after. Mark hot metal “HOT”. Fire: sound alarm, call 911, use extinguisher only if safe.</div>
+  Stop work if conditions change. Fire watch is continuous during hot work and for 2 hours after the last torch/tool is shut off — checking for smoke, heat or embers, including during breaks and lunch. If the fire watch person must leave, another trained worker must cover before they go. Mark hot metal “HOT”. Fire: sound alarm, call 911 immediately, use extinguisher only if safe.</div>
 </div>
 </section>
 
@@ -252,6 +290,12 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     document.getElementById('contractorOther').classList.toggle('hidden',this.value!=='other');
   });
 
+  // hot work: torch-only precautions
+  var hwSel=document.getElementById('hw-type');
+  function hwTorchVis(){ document.getElementById('hw-torch-only').classList.toggle('hidden',hwSel.value!=='Torch / open flame'); }
+  hwSel.addEventListener('change',hwTorchVis);
+  setTimeout(hwTorchVis,0);
+
   // signatures
   var sigs=document.getElementById('sigs'), count=0;
   function addSig(){
@@ -305,7 +349,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   });
 
   // restore fields
-  var FIELDS=['site','contractor','desc','supervisor','hw-type','fp-height','si-task','si-taskOther','si-resp'];
+  var FIELDS=['site','contractor','desc','supervisor','hw-type','hw-area','hw-workers','hw-firewatch','fp-height','si-task','si-taskOther','si-resp'];
   FIELDS.forEach(function(id){
     var el=document.getElementById(id);
     if(el && saved[id]!=null) el.value=saved[id];
@@ -342,7 +386,12 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
       ['Supervisor',document.getElementById('supervisor').value]
     ];
     if(active==='fall') rows.push(['Working height',document.getElementById('fp-height').value]);
-    if(active==='hot') rows.push(['Type of hot work',document.getElementById('hw-type').value]);
+    if(active==='hot'){
+      rows.push(['Type of hot work',document.getElementById('hw-type').value]);
+      rows.push(['Hot work area',document.getElementById('hw-area').value]);
+      rows.push(['Person(s) doing hot work',document.getElementById('hw-workers').value]);
+      rows.push(['Fire watch assigned to',document.getElementById('hw-firewatch').value]);
+    }
     if(active==='silica'){
       var siVal=document.getElementById('si-task').value;
       rows.push(['Task',siVal==='other'?document.getElementById('si-taskOther').value:siVal]);
