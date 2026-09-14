@@ -57,12 +57,26 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 .printbar button{flex:1;padding:14px;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer}
 #btnPrint{background:var(--accent);color:var(--accent-ink)}
 #btnEmail{background:var(--card);color:var(--accent);border:1px solid var(--accent)}
+#status{position:sticky;top:58px;z-index:4;margin:0 16px;padding:9px 12px;border-radius:8px;font-size:.8rem;font-weight:700;letter-spacing:.04em;text-align:center}
+#status.bad{background:#fdecec;color:#9b1c1c;border:1px solid #f1b8b8}
+#status.ok{background:#eef7dc;color:#3d5a00;border:1px solid #cfe3a0}
+#missing{margin:0 0 12px;padding:12px 14px;border-radius:8px;background:#fdecec;color:#9b1c1c;border:1px solid #f1b8b8;font-size:.9rem}
+#missing strong{display:block;margin-bottom:4px}
+#missing ul{margin:0;padding-left:18px}
+.printbar button:disabled{opacity:.45}
+.ov{position:fixed;inset:0;background:rgba(4,34,44,.6);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.ov .box{background:var(--card);color:var(--ink);width:100%;max-width:640px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));border-radius:14px 14px 0 0;border-top:3px solid var(--green)}
+.ov .box h3{margin:0 0 8px;font-size:1rem;color:var(--brand-blue)}
+.ov .box p{margin:0 0 16px;font-size:.95rem}
+.ov .row{display:flex;gap:10px}
+.ov .row button{flex:1;padding:14px;border-radius:8px;font-size:1rem;font-weight:700;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.ov .row button.go{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .meta{display:flex;gap:12px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .hidden{display:none}
 
 @media print{
   @page{margin:10mm}
-  .tabs,.printbar,.addsig,.sig-row button{display:none !important}
+  .tabs,.printbar,.addsig,.sig-row button,#status,#missing{display:none !important}
   body{background:#fff;color:#000;padding:0;font-size:8.5pt;line-height:1.25}
   :root{--card:#fff;--field:#fff;--ink:#000;--muted:#444;--line:#999;--bg:#fff}
   section.form.hidden{display:none}
@@ -102,6 +116,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   <button data-tab="hot">Hot Work</button>
   <button data-tab="silica">Silica ECP</button>
 </nav>
+<div id="status" class="bad">PERMIT INCOMPLETE — DO NOT START</div>
 
 <div class="wrap">
 
@@ -144,33 +159,33 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 <section class="form" id="form-fall">
 <div class="card">
   <h2>Site-Specific Fall Protection Plan</h2>
-  <p class="sub">WorkSafeBC OHS Reg. Part 11. Required at 3 m (10 ft); written plan at 7.5 m (25 ft).</p>
+  <p class="sub">WorkSafeBC OHS Reg. Part 11. Needed from 3 m (10 ft); written plan from 7.5 m (25 ft).</p>
 
-  <label class="f">Working height</label>
+  <label class="f">How high are you working?</label>
   <select id="fp-height">
     <option>3 m – 7.5 m (10–25 ft)</option>
     <option>Over 7.5 m (25 ft) — written plan required</option>
   </select>
 
-  <label class="f">Fall hazards today — check all that apply</label>
-  <div class="chk"><input type="checkbox"><span>Open floor / roof edge</span></div>
-  <div class="chk"><input type="checkbox"><span>Floor or roof openings</span></div>
-  <div class="chk"><input type="checkbox"><span>Working near excavation edge</span></div>
-  <div class="chk"><input type="checkbox"><span>Ladders / scaffold work</span></div>
-  <div class="chk"><input type="checkbox"><span>Leading edge / framing walls</span></div>
+  <label class="f">Where could you fall today? Check all that apply</label>
+  <div class="chk" data-group="hazard"><input type="checkbox"><span>Open edge of a floor or roof</span></div>
+  <div class="chk" data-group="hazard"><input type="checkbox"><span>Hole or opening in a floor or roof</span></div>
+  <div class="chk" data-group="hazard"><input type="checkbox"><span>Edge of an excavation</span></div>
+  <div class="chk" data-group="hazard"><input type="checkbox"><span>Ladder or scaffold</span></div>
+  <div class="chk" data-group="hazard"><input type="checkbox"><span>Leading edge / framing walls</span></div>
 
-  <label class="f">Fall protection system used — check all that apply</label>
-  <div class="chk"><input type="checkbox"><span>Guardrails</span></div>
-  <div class="chk"><input type="checkbox"><span>Full-body harness + lanyard on an approved anchor (min. 3.5 kN)</span></div>
-  <div class="chk"><input type="checkbox"><span>Self-retracting lifeline (SRL)</span></div>
-  <div class="chk"><input type="checkbox"><span>Control zone (min. 2 m from edge) with safety monitor</span></div>
-  <div class="chk"><input type="checkbox"><span>Covers over openings, secured and marked</span></div>
+  <label class="f">How are you protected? Check all that apply</label>
+  <div class="chk" data-group="system"><input type="checkbox"><span>Guardrails</span></div>
+  <div class="chk" data-group="system"><input type="checkbox"><span>Full-body harness and lanyard, tied off to an approved anchor (min. 3.5 kN)</span></div>
+  <div class="chk" data-group="system"><input type="checkbox"><span>Self-retracting lifeline (SRL)</span></div>
+  <div class="chk" data-group="system"><input type="checkbox"><span>Control zone: I stay at least 2 m from the edge and a safety monitor watches me</span></div>
+  <div class="chk" data-group="system"><input type="checkbox"><span>Openings are covered, secured and marked</span></div>
 
-  <div class="statement"><strong>Rescue</strong>
-  If a worker falls and is suspended: call 911 and the first aid attendant, keep the worker talking, rescue promptly with equipment on site if safe. Never leave them alone.</div>
+  <div class="statement"><strong>If someone falls</strong>
+  If a worker is hanging in their harness: call 911 and the first aid attendant, keep talking to them, and get them down fast with what you have on site — only if it is safe for you. Never leave them alone.</div>
 
-  <div class="statement"><strong>Equipment &amp; training</strong>
-  Equipment inspected before use each shift. Workers signing below are trained in the system used today.</div>
+  <div class="statement"><strong>Your equipment and training</strong>
+  You checked your harness, lanyard and anchor before using them today. Everyone signing below knows how to use the system chosen above.</div>
 </div>
 </section>
 
@@ -178,12 +193,12 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 <section class="form hidden" id="form-hot">
 <div class="card">
   <h2>Hot Work Permit</h2>
-  <p class="sub">Valid for today only, at the location described above. Welding, cutting, grinding, torch work.</p>
+  <p class="sub">Valid for today only, at the location above. Welding, cutting, grinding, torch work.</p>
 
   <div class="statement"><strong>Cut-off time</strong>
-  No hot work is permitted after 2:30 p.m. All torches and tools must be shut off by 2:30 p.m.</div>
+  No hot work after 2:30 p.m. Shut off all torches and tools by 2:30 p.m.</div>
 
-  <label class="f">Type of hot work</label>
+  <label class="f">What are you doing?</label>
   <select id="hw-type">
     <option>Grinding / cutting (sparks)</option>
     <option>Welding</option>
@@ -191,31 +206,31 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     <option>Soldering / brazing</option>
   </select>
 
-  <label class="f">Hot work area / location (specific — e.g. "Level 4, Unit 409")</label>
+  <label class="f">Exactly where? (e.g. "Level 4, Unit 409")</label>
   <input type="text" id="hw-area" placeholder="Building, level, unit">
 
-  <label class="f">Name(s) of person(s) doing the hot work</label>
+  <label class="f">Who is doing the hot work?</label>
   <input type="text" id="hw-workers" placeholder="Full name(s)">
 
-  <label class="f">Fire watch — name of person assigned</label>
+  <label class="f">Who is your fire watch?</label>
   <input type="text" id="hw-firewatch" placeholder="Full name">
 
-  <label class="f">Precautions — check all that apply</label>
-  <div class="chk"><input type="checkbox"><span>Combustibles, flammable liquids and gases removed or covered within 11 m (35 ft)</span></div>
-  <div class="chk"><input type="checkbox"><span>Charged ABC fire extinguisher at the work area, within reach</span></div>
-  <div class="chk"><input type="checkbox"><span>Floor/wall openings near the work covered or protected</span></div>
-  <div class="chk"><input type="checkbox"><span>Worker(s) doing hot work are site-oriented and hot-work trained</span></div>
-  <div class="chk"><input type="checkbox"><span>Continuous fire watch assigned during work AND for 2 hours after work stops — including through breaks and lunch (fire watch never left uncovered)</span></div>
+  <label class="f">Before you start — you must confirm every one</label>
+  <div class="chk" data-req="1"><input type="checkbox"><span>I moved or covered everything that can burn within 11 m (35 ft) of my work — wood, garbage, tarps, fuel, gas cylinders and propane tanks.</span></div>
+  <div class="chk" data-req="1"><input type="checkbox"><span>I have a charged ABC fire extinguisher next to me, within reach.</span></div>
+  <div class="chk" data-req="1"><input type="checkbox"><span>I covered or blocked any floor or wall openings near me so sparks cannot fall through.</span></div>
+  <div class="chk" data-req="1"><input type="checkbox"><span>I did the WDC site orientation and I am trained for this hot work.</span></div>
+  <div class="chk" data-req="1"><input type="checkbox"><span>My fire watch stays with me while I work and for 2 hours after I stop — including my breaks and lunch. If they have to leave, someone else takes over first.</span></div>
 
   <div id="hw-torch-only" class="hidden">
-    <label class="f">Torch-specific precautions</label>
-    <div class="chk"><input type="checkbox"><span>Propane cylinder secured upright, kept 3 m (10 ft) from open flame</span></div>
-    <div class="chk"><input type="checkbox"><span>Torch, hose and connections checked — no leaks or damage</span></div>
-    <div class="chk"><input type="checkbox"><span>Worker(s) are torch-safe certified (RCABC or equivalent)</span></div>
+    <label class="f">Torch — you must confirm every one</label>
+    <div class="chk" data-req="1"><input type="checkbox"><span>My propane cylinder is standing up, secured, and at least 3 m (10 ft) from the flame.</span></div>
+    <div class="chk" data-req="1"><input type="checkbox"><span>I checked my torch, hose and connections — no leaks, no damage.</span></div>
+    <div class="chk" data-req="1"><input type="checkbox"><span>I am torch-safe certified (RCABC or equivalent).</span></div>
   </div>
 
-  <div class="statement"><strong>Rules</strong>
-  Stop work if conditions change. Fire watch is continuous during the work and for 2 hours after the last torch or tool is shut off, including breaks — if they must leave, another trained worker covers first. Mark hot metal “HOT”. Fire: call 911 immediately, use extinguisher only if safe.</div>
+  <div class="statement"><strong>While you work</strong>
+  If anything changes, stop. When you finish, mark hot metal “HOT”. If there is a fire: call 911 right away, and use the extinguisher only if it is safe for you.</div>
 </div>
 </section>
 
@@ -223,9 +238,9 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 <section class="form hidden" id="form-silica">
 <div class="card">
   <h2>Silica Exposure Control Plan</h2>
-  <p class="sub">WorkSafeBC OHS Reg. 5.54. Silica dust from concrete, masonry or rock can cause lung disease.</p>
+  <p class="sub">WorkSafeBC OHS Reg. 5.54. Dust from concrete, masonry or rock can damage your lungs.</p>
 
-  <label class="f">Task creating silica dust</label>
+  <label class="f">What are you doing that makes dust?</label>
   <select id="si-task">
     <option>Cutting concrete / masonry (saw)</option>
     <option>Drilling / coring concrete</option>
@@ -236,31 +251,34 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   </select>
   <input type="text" id="si-taskOther" class="hidden" placeholder="Describe the task" style="margin-top:8px">
 
-  <label class="f">Dust controls used — check all that apply</label>
-  <div class="chk"><input type="checkbox"><span>Water applied at the cutting point (wet method)</span></div>
-  <div class="chk"><input type="checkbox"><span>Tool with dust shroud + HEPA vacuum</span></div>
-  <div class="chk"><input type="checkbox"><span>Work area isolated — other workers kept away</span></div>
-  <div class="chk"><input type="checkbox"><span>HEPA vacuum or wet cleanup only — no dry sweeping</span></div>
+  <label class="f">How are you controlling the dust? Check all that apply</label>
+  <div class="chk" data-group="control"><input type="checkbox"><span>Water on the blade or bit while I cut or drill (wet method)</span></div>
+  <div class="chk" data-group="control"><input type="checkbox"><span>Dust shroud on my tool, connected to a HEPA vacuum</span></div>
+  <div class="chk" data-group="control"><input type="checkbox"><span>I keep other workers out of my dust area</span></div>
+  <div class="chk" data-group="control"><input type="checkbox"><span>I clean up with a HEPA vacuum or water — never dry sweeping</span></div>
 
-  <label class="f">Respiratory protection</label>
+  <label class="f">What respirator are you wearing?</label>
   <select id="si-resp">
     <option>Half-face respirator with P100 filters (fit-tested)</option>
-    <option>N95 (short task, with wet/vacuum controls)</option>
+    <option>N95 — only for a short task with water or vacuum control</option>
     <option>Full-face respirator with P100</option>
   </select>
 
-  <div class="statement"><strong>Rules</strong>
-  Controls checked and used at all times, respirators worn correctly (clean-shaven seal). Stop the task if visible dust escapes. Wash hands before eating or drinking.</div>
+  <div class="statement"><strong>While you work</strong>
+  Use your controls the whole time. Wear your respirator properly — no beard where it seals. If you see dust escaping, stop and fix it. Wash your hands before you eat or drink.</div>
 </div>
 </section>
 
 <!-- ================= SIGNATURES ================= -->
 <div class="card" id="sigcard">
   <h2>Signatures</h2>
-  <p class="sub">Each person signing confirms they understood this plan and will follow it today.</p>
+  <div class="statement" id="decl"><strong>Declaration</strong>
+  By signing, I confirm everything I checked above is true and in place right now. Work without these controls is not permitted on WDC sites and will be stopped.</div>
   <div id="sigs"></div>
   <button class="addsig" id="addSig">+ Add another signature</button>
 </div>
+
+<div id="missing" class="hidden"></div>
 
 </div><!-- /wrap -->
 
@@ -325,13 +343,13 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
       return {x:t.clientX-r.left,y:t.clientY-r.top};
     }
     function start(e){e.preventDefault();drawing=true;var p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);}
-    function move(e){if(!drawing)return;e.preventDefault();var p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();}
+    function move(e){if(!drawing)return;e.preventDefault();var p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();c.dataset.drawn='1';validate();}
     function end(){drawing=false;}
     c.addEventListener('pointerdown',start);
     c.addEventListener('pointermove',move);
     window.addEventListener('pointerup',end);
     wrap.querySelector('button').addEventListener('click',function(){
-      ctx.clearRect(0,0,c.width,c.height);
+      ctx.clearRect(0,0,c.width,c.height); delete c.dataset.drawn; validate();
     });
   }
   addSig(); addSig(); addSig();
@@ -377,7 +395,70 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     persist();
   });
 
-  document.getElementById('btnPrint').addEventListener('click',function(){window.print();});
+  // ---- completeness check: a permit is either complete or it does not exist ----
+  function val(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
+  function validate(){
+    var active=document.querySelector('.tabs button.active').dataset.tab;
+    var form=document.getElementById('form-'+active);
+    var miss=[];
+    if(!val('desc')) miss.push('Work description');
+    if(!val('supervisor')) miss.push('Supervisor name');
+    if(contractorSel.value==='other' && !otherInput.value.trim()) miss.push('Company name');
+    if(active==='hot'){
+      if(!val('hw-area')) miss.push('Exactly where the hot work is');
+      if(!val('hw-workers')) miss.push('Who is doing the hot work');
+      if(!val('hw-firewatch')) miss.push('Fire watch name');
+      var n=0;
+      form.querySelectorAll('.chk[data-req]').forEach(function(row){
+        if(row.offsetParent===null) return; // hidden torch block
+        if(!row.querySelector('input').checked) n++;
+      });
+      if(n) miss.push(n+' precaution'+(n>1?'s':'')+' not confirmed');
+    }
+    if(active==='fall'){
+      if(!form.querySelector('.chk[data-group=hazard] input:checked')) miss.push('Where you could fall (at least 1)');
+      if(!form.querySelector('.chk[data-group=system] input:checked')) miss.push('How you are protected (at least 1)');
+    }
+    if(active==='silica'){
+      if(document.getElementById('si-task').value==='other' && !val('si-taskOther')) miss.push('Describe the task');
+      if(!form.querySelector('.chk[data-group=control] input:checked')) miss.push('Dust control (at least 1)');
+    }
+    var signed=false;
+    document.querySelectorAll('#sigs .sig-block').forEach(function(bl){
+      if(bl.querySelector('canvas').dataset.drawn && bl.querySelector('input').value.trim()) signed=true;
+    });
+    if(!signed) miss.push('At least 1 signature with printed name');
+    var st=document.getElementById('status');
+    st.className=miss.length?'bad':'ok';
+    st.textContent=miss.length?'PERMIT INCOMPLETE — DO NOT START':'PERMIT COMPLETE — sign and send to Safety';
+    var mb=document.getElementById('missing');
+    if(miss.length){
+      mb.innerHTML='<strong>Not done yet:</strong><ul>'+miss.map(function(m){return '<li>'+m+'</li>';}).join('')+'</ul>';
+    }else{ mb.classList.add('hidden'); }
+    return miss;
+  }
+  document.addEventListener('input',validate);
+  document.addEventListener('change',validate);
+  document.querySelectorAll('.tabs button').forEach(function(b){ b.addEventListener('click',function(){ setTimeout(validate,0); }); });
+  setTimeout(validate,0);
+
+  function gate(then){
+    var miss=validate();
+    if(miss.length){
+      var mb=document.getElementById('missing');
+      mb.classList.remove('hidden');
+      mb.scrollIntoView({behavior:'smooth',block:'center'});
+      return;
+    }
+    var ov=document.createElement('div'); ov.className='ov';
+    ov.innerHTML='<div class="box"><h3>Before you send</h3>'+
+      '<p>'+document.querySelector('#decl').textContent.replace('Declaration','').trim()+'</p>'+
+      '<div class="row"><button type="button" id="ovNo">Go back</button><button type="button" class="go" id="ovYes">I confirm</button></div></div>';
+    document.body.appendChild(ov);
+    ov.querySelector('#ovNo').addEventListener('click',function(){ov.remove();});
+    ov.querySelector('#ovYes').addEventListener('click',function(){ov.remove();then();});
+  }
+  document.getElementById('btnPrint').addEventListener('click',function(){ gate(function(){ window.print(); }); });
   // ---- build a real PDF (text + signature images) and share it ----
   function pdfEscape(t){return t.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[^\x20-\x7e]/g,' ');}
   function collectData(){
@@ -412,6 +493,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
       var strong=st.querySelector('strong');
       statements.push([strong.textContent, st.textContent.replace(strong.textContent,'').trim()]);
     });
+    statements.push(['Declaration', document.querySelector('#decl').textContent.replace('Declaration','').trim()]);
     var sigsArr=[];
     document.querySelectorAll('#sigs .sig-block').forEach(function(bl){
       var name=bl.querySelector('input').value.trim();
@@ -494,7 +576,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     });
     // footer
     c+=GREEN+' rg '+M+' 30 '+(W-2*M)+' 1.5 re f\n';
-    txt('safety@wdc2020corp.com',7.5,M,18,GREY,false);
+    txt('Send to Safety: text 604-906-0247  |  safety@wdc2020corp.com',7.5,M,18,GREY,false);
     var objs=[];
     objs.push('<< /Type /Catalog /Pages 2 0 R >>');
     objs.push('<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
@@ -517,13 +599,27 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     for(var i=0;i<out.length;i++) bytes[i]=out.charCodeAt(i)&0xff;
     return bytes;
   }
-  document.getElementById('btnEmail').addEventListener('click',function(){
+  document.getElementById('btnEmail').addEventListener('click',function(){ gate(sendPdf); });
+  function showPdfOverlay(blob,fname){
+    var url=URL.createObjectURL(blob);
+    var ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:99;display:flex;flex-direction:column';
+    ov.innerHTML='<div style="padding:10px 16px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line)">'+
+      '<strong style="flex:1;font-size:.9rem">'+fname+'</strong>'+
+      '<a href="'+url+'" download="'+fname+'" target="_blank" style="color:var(--accent);font-weight:700;text-decoration:none">Open / Download</a>'+
+      '<button id="ovClose" style="padding:8px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px">Close</button></div>'+
+      '<iframe src="'+url+'" style="flex:1;border:none;width:100%"></iframe>'+
+      '<div style="padding:8px 16px;font-size:.8rem;color:var(--muted)">Use your browser menu (Share) to text this PDF to 604-906-0247 or email safety@wdc2020corp.com</div>';
+    document.body.appendChild(ov);
+    ov.querySelector('#ovClose').addEventListener('click',function(){ov.remove();URL.revokeObjectURL(url);});
+  }
+  function sendPdf(){
     var d=collectData();
     var bytes=buildPdf(d);
     var blob=new Blob([bytes],{type:'application/pdf'});
     var file=new File([blob],d.fname,{type:'application/pdf'});
     if(navigator.canShare && navigator.canShare({files:[file]})){
-      navigator.share({files:[file],title:d.fname,text:'To: safety@wdc2020corp.com'}).catch(function(err){
+      navigator.share({files:[file],title:d.fname,text:'Send to Safety: text 604-906-0247 or email safety@wdc2020corp.com'}).catch(function(err){
         if(err && err.name!=='AbortError') showPdfOverlay(blob,d.fname);
       });
     }else{
@@ -533,7 +629,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
         showPdfOverlay(blob,d.fname);
       }catch(e){ showPdfOverlay(blob,d.fname); }
     }
-  });
+  }
 
 })();
 </script>
