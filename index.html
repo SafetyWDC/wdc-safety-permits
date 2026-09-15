@@ -130,7 +130,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   </select>
   <label class="f">Company doing the work</label>
   <select id="contractor">
-    <option>Whistler 2020 Development Corp</option>
+    <option value="" disabled selected>Select your company…</option>
     <option>AWSE</option>
     <option>Bjordal</option>
     <option>Blacktail Reinforcing</option>
@@ -146,6 +146,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     <option>Solid Ground Contracting</option>
     <option>True Air System</option>
     <option>True North Masonary</option>
+    <option>Whistler 2020 Development Corp</option>
     <option value="other">Other — type below</option>
   </select>
   <input type="text" id="contractorOther" class="hidden" placeholder="Company name" style="margin-top:8px">
@@ -375,7 +376,8 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   var FIELDS=['site','contractor','desc','supervisor','hw-type','hw-area','hw-workers','hw-firewatch','fp-height','si-task','si-taskOther','si-resp'];
   FIELDS.forEach(function(id){
     var el=document.getElementById(id);
-    if(el && saved[id]!=null){ el.value=saved[id]; if(el.tagName==='SELECT' && el.selectedIndex<0){ el.selectedIndex=0; saved[id]=el.value; } }
+    var skip=(id==='contractor' && (!saved[id] || saved[id]==='Whistler 2020 Development Corp'));
+    if(el && !skip && saved[id]!=null){ el.value=saved[id]; if(el.tagName==='SELECT' && el.selectedIndex<0){ el.selectedIndex=0; saved[id]=el.value; } }
     if(el) el.addEventListener('change',function(){ saved[id]=el.value; persist(); });
     if(el && (el.tagName==='TEXTAREA'||el.type==='text')) el.addEventListener('input',function(){ saved[id]=el.value; persist(); });
   });
@@ -403,7 +405,8 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     var miss=[];
     if(!val('desc')) miss.push('Work description');
     if(!val('supervisor')) miss.push('Supervisor name');
-    if(contractorSel.value==='other' && !otherInput.value.trim()) miss.push('Company name');
+    if(!contractorSel.value) miss.push('Your company');
+    else if(contractorSel.value==='other' && !otherInput.value.trim()) miss.push('Company name');
     if(active==='hot'){
       if(!val('hw-area')) miss.push('Exactly where the hot work is');
       if(!val('hw-workers')) miss.push('Who is doing the hot work');
