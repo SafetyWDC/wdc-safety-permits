@@ -168,14 +168,14 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     <option>Over 7.5 m (25 ft) — written plan required</option>
   </select>
 
-  <label class="f">Where could you fall today? Check all that apply</label>
+  <label class="f">Where could you fall today? Pick only what is true for your work (at least 1)</label>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Open edge of a floor or roof</span></div>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Hole or opening in a floor or roof</span></div>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Edge of an excavation</span></div>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Ladder or scaffold</span></div>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Leading edge / framing walls</span></div>
 
-  <label class="f">How are you protected? Check all that apply</label>
+  <label class="f">How are you protected? Pick only what you are using today (at least 1)</label>
   <div class="chk" data-group="system"><input type="checkbox"><span>Guardrails</span></div>
   <div class="chk" data-group="system"><input type="checkbox"><span>Full-body harness and lanyard, tied off to an approved anchor (min. 3.5 kN)</span></div>
   <div class="chk" data-group="system"><input type="checkbox"><span>Self-retracting lifeline (SRL)</span></div>
@@ -205,7 +205,9 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     <option>Welding</option>
     <option>Torch / open flame</option>
     <option>Soldering / brazing</option>
+    <option value="other">Other — type below</option>
   </select>
+  <input type="text" id="hw-typeOther" class="hidden" placeholder="Describe the hot work" style="margin-top:8px">
 
   <label class="f">Exactly where? (e.g. "Level 4, Unit 409")</label>
   <input type="text" id="hw-area" placeholder="Building, level, unit">
@@ -222,13 +224,6 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   <div class="chk" data-req="1"><input type="checkbox"><span>I covered or blocked any floor or wall openings near me so sparks cannot fall through.</span></div>
   <div class="chk" data-req="1"><input type="checkbox"><span>I did the WDC site orientation and I am trained for this hot work.</span></div>
   <div class="chk" data-req="1"><input type="checkbox"><span>My fire watch stays with me while I work and for 2 hours after I stop — including my breaks and lunch. If they have to leave, someone else takes over first.</span></div>
-
-  <div id="hw-torch-only" class="hidden">
-    <label class="f">Torch — you must confirm every one</label>
-    <div class="chk" data-req="1"><input type="checkbox"><span>My propane cylinder is standing up, secured, and at least 3 m (10 ft) from the flame.</span></div>
-    <div class="chk" data-req="1"><input type="checkbox"><span>I checked my torch, hose and connections — no leaks, no damage.</span></div>
-    <div class="chk" data-req="1"><input type="checkbox"><span>I am torch-safe certified (RCABC or equivalent).</span></div>
-  </div>
 
   <div class="statement"><strong>While you work</strong>
   If anything changes, stop. When you finish, mark hot metal “HOT”. If there is a fire: call 911 right away, and use the extinguisher only if it is safe for you.</div>
@@ -252,7 +247,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   </select>
   <input type="text" id="si-taskOther" class="hidden" placeholder="Describe the task" style="margin-top:8px">
 
-  <label class="f">How are you controlling the dust? Check all that apply</label>
+  <label class="f">How are you controlling the dust? Pick only what you are doing (at least 1)</label>
   <div class="chk" data-group="control"><input type="checkbox"><span>Water on the blade or bit while I cut or drill (wet method)</span></div>
   <div class="chk" data-group="control"><input type="checkbox"><span>Dust shroud on my tool, connected to a HEPA vacuum</span></div>
   <div class="chk" data-group="control"><input type="checkbox"><span>I keep other workers out of my dust area</span></div>
@@ -306,6 +301,10 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 
   // contractor other
   var cSel=document.getElementById('contractor');
+  var hwTypeSel=document.getElementById('hw-type');
+  function hwOtherVis(){ document.getElementById('hw-typeOther').classList.toggle('hidden',hwTypeSel.value!=='other'); }
+  hwTypeSel.addEventListener('change',hwOtherVis);
+  setTimeout(hwOtherVis,0);
   var siSel=document.getElementById('si-task');
   function siOtherVis(){ document.getElementById('si-taskOther').classList.toggle('hidden',siSel.value!=='other'); }
   siSel.addEventListener('change',siOtherVis);
@@ -313,12 +312,6 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   cSel.addEventListener('change',function(){
     document.getElementById('contractorOther').classList.toggle('hidden',this.value!=='other');
   });
-
-  // hot work: torch-only precautions
-  var hwSel=document.getElementById('hw-type');
-  function hwTorchVis(){ document.getElementById('hw-torch-only').classList.toggle('hidden',hwSel.value!=='Torch / open flame'); }
-  hwSel.addEventListener('change',hwTorchVis);
-  setTimeout(hwTorchVis,0);
 
   // signatures
   var sigs=document.getElementById('sigs'), count=0;
@@ -373,7 +366,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   });
 
   // restore fields
-  var FIELDS=['site','contractor','desc','supervisor','hw-type','hw-area','hw-workers','hw-firewatch','fp-height','si-task','si-taskOther','si-resp'];
+  var FIELDS=['site','contractor','desc','supervisor','hw-type','hw-typeOther','hw-area','hw-workers','hw-firewatch','fp-height','si-task','si-taskOther','si-resp'];
   FIELDS.forEach(function(id){
     var el=document.getElementById(id);
     var skip=(id==='contractor' && (!saved[id] || saved[id]==='Whistler 2020 Development Corp'));
@@ -408,12 +401,12 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     if(!contractorSel.value) miss.push('Your company');
     else if(contractorSel.value==='other' && !otherInput.value.trim()) miss.push('Company name');
     if(active==='hot'){
+      if(hwTypeSel.value==='other' && !val('hw-typeOther')) miss.push('Describe the hot work');
       if(!val('hw-area')) miss.push('Exactly where the hot work is');
       if(!val('hw-workers')) miss.push('Who is doing the hot work');
       if(!val('hw-firewatch')) miss.push('Fire watch name');
       var n=0;
       form.querySelectorAll('.chk[data-req]').forEach(function(row){
-        if(row.offsetParent===null) return; // hidden torch block
         if(!row.querySelector('input').checked) n++;
       });
       if(n) miss.push(n+' precaution'+(n>1?'s':'')+' not confirmed');
@@ -476,7 +469,8 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     ];
     if(active==='fall') rows.push(['Working height',document.getElementById('fp-height').value]);
     if(active==='hot'){
-      rows.push(['Type of hot work',document.getElementById('hw-type').value]);
+      var hwVal=document.getElementById('hw-type').value;
+      rows.push(['Type of hot work',hwVal==='other'?document.getElementById('hw-typeOther').value:hwVal]);
       rows.push(['Hot work area',document.getElementById('hw-area').value]);
       rows.push(['Person(s) doing hot work',document.getElementById('hw-workers').value]);
       rows.push(['Fire watch assigned to',document.getElementById('hw-firewatch').value]);
