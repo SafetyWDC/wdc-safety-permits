@@ -43,6 +43,8 @@ textarea{min-height:70px}
 .chk{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.95rem}
 .chk:last-child{border-bottom:none}
 .chk input{width:22px;height:22px;margin-top:1px;accent-color:var(--accent);flex-shrink:0}
+.chk-other span{flex:1;display:flex;align-items:center;gap:8px}
+.chk-other .other-txt{flex:1;padding:8px 10px;font-size:.95rem}
 .statement{background:var(--field);border-left:2px solid var(--green);padding:10px 12px;border-radius:0 8px 8px 0;font-size:.9rem;margin:10px 0}
 .statement strong{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
 
@@ -75,30 +77,31 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 .hidden{display:none}
 
 @media print{
-  @page{margin:10mm}
+  @page{margin:8mm}
   .tabs,.printbar,.addsig,.sig-row button,#status,#missing{display:none !important}
-  body{background:#fff;color:#000;padding:0;font-size:8.5pt;line-height:1.25}
+  body{background:#fff;color:#000;padding:0;font-size:8pt;line-height:1.2}
   :root{--card:#fff;--field:#fff;--ink:#000;--muted:#444;--line:#999;--bg:#fff}
   section.form.hidden{display:none}
   header.top{padding:0 0 2mm}
   header.top h1{font-size:11pt}
   header.top p{font-size:7.5pt}
   .wrap{max-width:none;padding:0}
-  .card{border:none;border-top:1px solid #999;border-radius:0;padding:2mm 0;margin-bottom:0}
+  .card{border:none;border-top:1px solid #999;border-radius:0;padding:1.5mm 0;margin-bottom:0}
   .card h2{font-size:9.5pt;margin:0}
   .card .sub{font-size:7pt;margin:0 0 1mm}
-  label.f{font-size:6.5pt;margin:1.5mm 0 0.5mm}
-  select,input[type=text],textarea{padding:1mm;font-size:8.5pt;border:none;border-bottom:1px solid #999;border-radius:0;min-height:0}
+  label.f{font-size:6.5pt;margin:1.2mm 0 0.3mm}
+  select,input[type=text],textarea{padding:0.6mm 1mm;font-size:8pt;border:none;border-bottom:1px solid #999;border-radius:0;min-height:0}
   textarea{min-height:0;height:auto}
-  .chk{padding:0.8mm 0;font-size:8pt;border-bottom:none}
+  .chk{padding:0.5mm 0;font-size:7.8pt;border-bottom:none}
   .chk input{width:3.2mm;height:3.2mm}
-  .statement{font-size:7.5pt;padding:1mm 2mm;margin:1mm 0}
+  .chk-other .other-txt{padding:0 1mm;font-size:7.8pt}
+  .statement{font-size:7.3pt;padding:0.8mm 2mm;margin:0.8mm 0}
   .statement strong{font-size:6.5pt}
   .meta{font-size:7.5pt}
   #sigcard .sub{display:none}
   #sigs{display:flex;flex-wrap:wrap;gap:2mm}
   .sig-block{width:48%;margin-top:0}
-  canvas.sig{height:16mm}
+  canvas.sig{height:14mm}
   .sig-row{margin-top:0.5mm}
   .sig-row input{font-size:8pt}
 }
@@ -173,14 +176,19 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Hole or opening in a floor or roof</span></div>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Edge of an excavation</span></div>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Ladder or scaffold</span></div>
+  <div class="chk" data-group="hazard"><input type="checkbox"><span>Boom lift, scissor lift or other elevating platform</span></div>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Leading edge / framing walls</span></div>
+  <div class="chk chk-other" data-group="hazard"><input type="checkbox"><span>Other: <input type="text" class="other-txt" placeholder="describe"></span></div>
 
   <label class="f">How are you protected? Pick only what you are using today (at least 1)</label>
   <div class="chk" data-group="system"><input type="checkbox"><span>Guardrails</span></div>
   <div class="chk" data-group="system"><input type="checkbox"><span>Full-body harness and lanyard, tied off to an approved anchor (min. 3.5 kN)</span></div>
   <div class="chk" data-group="system"><input type="checkbox"><span>Self-retracting lifeline (SRL)</span></div>
+  <div class="chk" data-group="system"><input type="checkbox"><span>Boom lift: harness tied to the anchor point on the platform (OHS 13.33)</span></div>
+  <div class="chk" data-group="system"><input type="checkbox"><span>Scissor lift: guardrails and chains in place, on firm level ground</span></div>
   <div class="chk" data-group="system"><input type="checkbox"><span>Control zone: I stay at least 2 m from the edge and a safety monitor watches me</span></div>
   <div class="chk" data-group="system"><input type="checkbox"><span>Openings are covered, secured and marked</span></div>
+  <div class="chk chk-other" data-group="system"><input type="checkbox"><span>Other: <input type="text" class="other-txt" placeholder="describe"></span></div>
 
   <div class="statement"><strong>If someone falls</strong>
   If a worker is hanging in their harness: call 911 and the first aid attendant, keep talking to them, and get them down fast with what you have on site — only if it is safe for you. Never leave them alone.</div>
@@ -219,14 +227,14 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   <input type="text" id="hw-firewatch" placeholder="Full name">
 
   <label class="f">Before you start — you must confirm every one</label>
-  <div class="chk" data-req="1"><input type="checkbox"><span>I moved or covered everything that can burn within 11 m (35 ft) of my work — wood, garbage, tarps, fuel, gas cylinders and propane tanks.</span></div>
+  <div class="chk" data-req="1"><input type="checkbox"><span>Everything that can burn within 11 m (35 ft) of my work is moved away — or, if it cannot be moved, covered with a fire blanket or shield (wood, garbage, tarps, fuel, gas cylinders, propane tanks).</span></div>
   <div class="chk" data-req="1"><input type="checkbox"><span>I have a charged ABC fire extinguisher next to me, within reach.</span></div>
   <div class="chk" data-req="1"><input type="checkbox"><span>I covered or blocked any floor or wall openings near me so sparks cannot fall through.</span></div>
   <div class="chk" data-req="1"><input type="checkbox"><span>I did the WDC site orientation and I am trained for this hot work.</span></div>
   <div class="chk" data-req="1"><input type="checkbox"><span>My fire watch stays with me while I work and for 2 hours after I stop — including my breaks and lunch. If they have to leave, someone else takes over first.</span></div>
 
   <div class="statement"><strong>While you work</strong>
-  If anything changes, stop. When you finish, mark hot metal “HOT”. If there is a fire: call 911 right away, and use the extinguisher only if it is safe for you.</div>
+  If something that can burn cannot be moved or covered, do not do the hot work there — move the work or use a tool that makes no sparks. If anything changes, stop. When you finish, mark hot metal “HOT”. If there is a fire: call 911 right away, and use the extinguisher only if it is safe for you.</div>
 </div>
 </section>
 
@@ -252,13 +260,16 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   <div class="chk" data-group="control"><input type="checkbox"><span>Dust shroud on my tool, connected to a HEPA vacuum</span></div>
   <div class="chk" data-group="control"><input type="checkbox"><span>I keep other workers out of my dust area</span></div>
   <div class="chk" data-group="control"><input type="checkbox"><span>I clean up with a HEPA vacuum or water — never dry sweeping</span></div>
+  <div class="chk chk-other" data-group="control"><input type="checkbox"><span>Other: <input type="text" class="other-txt" placeholder="describe"></span></div>
 
   <label class="f">What respirator are you wearing?</label>
   <select id="si-resp">
     <option>Half-face respirator with P100 filters (fit-tested)</option>
     <option>N95 — only for a short task with water or vacuum control</option>
     <option>Full-face respirator with P100</option>
+    <option value="other">Other — type below</option>
   </select>
+  <input type="text" id="si-respOther" class="hidden" placeholder="Describe the respirator" style="margin-top:8px">
 
   <div class="statement"><strong>While you work</strong>
   Use your controls the whole time. Wear your respirator properly — no beard where it seals. If you see dust escaping, stop and fix it. Wash your hands before you eat or drink.</div>
@@ -305,6 +316,10 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   function hwOtherVis(){ document.getElementById('hw-typeOther').classList.toggle('hidden',hwTypeSel.value!=='other'); }
   hwTypeSel.addEventListener('change',hwOtherVis);
   setTimeout(hwOtherVis,0);
+  var siRespSel=document.getElementById('si-resp');
+  function siRespVis(){ document.getElementById('si-respOther').classList.toggle('hidden',siRespSel.value!=='other'); }
+  siRespSel.addEventListener('change',siRespVis);
+  setTimeout(siRespVis,0);
   var siSel=document.getElementById('si-task');
   function siOtherVis(){ document.getElementById('si-taskOther').classList.toggle('hidden',siSel.value!=='other'); }
   siSel.addEventListener('change',siOtherVis);
@@ -366,7 +381,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   });
 
   // restore fields
-  var FIELDS=['site','contractor','desc','supervisor','hw-type','hw-typeOther','hw-area','hw-workers','hw-firewatch','fp-height','si-task','si-taskOther','si-resp'];
+  var FIELDS=['site','contractor','desc','supervisor','hw-type','hw-typeOther','hw-area','hw-workers','hw-firewatch','fp-height','si-task','si-taskOther','si-resp','si-respOther'];
   FIELDS.forEach(function(id){
     var el=document.getElementById(id);
     var skip=(id==='contractor' && (!saved[id] || saved[id]==='Whistler 2020 Development Corp'));
@@ -412,13 +427,17 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
       if(n) miss.push(n+' precaution'+(n>1?'s':'')+' not confirmed');
     }
     if(active==='fall'){
-      if(!form.querySelector('.chk[data-group=hazard] input:checked')) miss.push('Where you could fall (at least 1)');
-      if(!form.querySelector('.chk[data-group=system] input:checked')) miss.push('How you are protected (at least 1)');
+      if(!form.querySelector('.chk[data-group=hazard] input[type=checkbox]:checked')) miss.push('Where you could fall (at least 1)');
+      if(!form.querySelector('.chk[data-group=system] input[type=checkbox]:checked')) miss.push('How you are protected (at least 1)');
     }
     if(active==='silica'){
       if(document.getElementById('si-task').value==='other' && !val('si-taskOther')) miss.push('Describe the task');
-      if(!form.querySelector('.chk[data-group=control] input:checked')) miss.push('Dust control (at least 1)');
+      if(!form.querySelector('.chk[data-group=control] input[type=checkbox]:checked')) miss.push('Dust control (at least 1)');
     }
+    form.querySelectorAll('.chk-other').forEach(function(row){
+      if(row.querySelector('input[type=checkbox]').checked && !row.querySelector('.other-txt').value.trim()) miss.push('Describe "Other"');
+    });
+    if(active==='silica' && siRespSel.value==='other' && !val('si-respOther')) miss.push('Describe the respirator');
     var signed=false;
     document.querySelectorAll('#sigs .sig-block').forEach(function(bl){
       if(bl.querySelector('canvas').dataset.drawn && bl.querySelector('input').value.trim()) signed=true;
@@ -478,12 +497,14 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     if(active==='silica'){
       var siVal=document.getElementById('si-task').value;
       rows.push(['Task',siVal==='other'?document.getElementById('si-taskOther').value:siVal]);
-      rows.push(['Respirator',document.getElementById('si-resp').value]);
+      var rv=document.getElementById('si-resp').value;
+      rows.push(['Respirator',rv==='other'?document.getElementById('si-respOther').value:rv]);
     }
     var form=document.getElementById('form-'+active);
     var checks=[];
     form.querySelectorAll('.chk').forEach(function(row){
-      checks.push([row.querySelector('input').checked, row.querySelector('span').textContent]);
+      var ot=row.querySelector('.other-txt');
+      checks.push([row.querySelector('input').checked, ot?('Other: '+ot.value.trim()):row.querySelector('span').textContent]);
     });
     var statements=[];
     form.querySelectorAll('.statement').forEach(function(st){
