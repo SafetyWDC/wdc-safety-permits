@@ -529,7 +529,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   }
   function buildPdf(d){
     var W=612,H=792,M=48;
-    var BLUE='0 0.239 0.322', GREEN='0.588 0.776 0.11', GREY='0.42 0.5 0.53', DARK='0.09 0.2 0.24';
+    var BLUE='0 0.239 0.322', GREEN='0.588 0.776 0.11', GREY='0.25 0.29 0.31', DARK='0 0 0';
     var c='', y;
     function esc(t){return pdfEscape(t);}
     function txt(t,size,x,yy,color,bold){
@@ -550,13 +550,13 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     txt(d.dateStr,9,M,H-76,GREY,false);
     c+=GREEN+' rg '+M+' '+(H-86)+' '+(W-2*M)+' 1.5 re f\n';
     y=H-106;
-    // info rows: grey label / dark value
+    // info rows: label on its own line, value stacked below (never collides regardless of label length)
     d.rows.forEach(function(r){
       txt(r[0].toUpperCase(),7,M,y,GREY,true);
-      wrap(r[1]||'-',80).forEach(function(ln,i){
-        txt(ln,10.5,M+95,y-(i*13),DARK,false);
-      });
-      y-=Math.max(1,wrap(r[1]||'-',80).length)*13+5;
+      y-=11;
+      var lines=wrap(r[1]||'-',95);
+      lines.forEach(function(ln,i){ txt(ln,10.5,M,y-(i*13),DARK,false); });
+      y-=lines.length*13+7;
     });
     y-=6;
     // checklist
