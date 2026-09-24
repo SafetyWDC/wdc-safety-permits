@@ -46,7 +46,8 @@ textarea{min-height:70px}
 .chk-other span{flex:1;display:flex;align-items:center;gap:8px}
 .chk-other .other-txt{flex:1;padding:8px 10px;font-size:.95rem}
 .statement{background:var(--field);border-left:2px solid var(--green);padding:10px 12px;border-radius:0 8px 8px 0;font-size:.9rem;margin:10px 0}
-.statement strong{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
+.statement .stlabel{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
+.statement strong{font-weight:800}
 
 .sig-block{margin-top:10px}
 .print-only{display:none}
@@ -99,7 +100,8 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   .chk input{width:3.2mm;height:3.2mm}
   .chk-other .other-txt{padding:0 1mm;font-size:7.8pt}
   .statement{font-size:7.3pt;padding:0.8mm 2mm;margin:0.8mm 0}
-  .statement strong{font-size:6.5pt}
+  .statement .stlabel{font-size:6.5pt}
+  .statement strong{font-weight:800}
   .meta{font-size:7.5pt}
   #sigcard .sub{display:none}
   #sigs{display:flex;flex-wrap:wrap;gap:2mm}
@@ -175,7 +177,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 <section class="form" id="form-fall">
 <div class="card">
   <h2>Site-Specific Fall Protection Plan</h2>
-  <p class="sub">WorkSafeBC OHS Reg. Part 11. Needed from 3 m (10 ft); written plan from 7.5 m (25 ft). Covers this task — review it again if the work or the hazards change.</p>
+  <p class="sub">WorkSafeBC rule (Part 11). Needed at 3 m (10 ft) or higher. Written plan needed at 7.5 m (25 ft) or higher. This plan is for this task — check it again if the work changes.</p>
 
   <label class="f">How high are you working?</label>
   <select id="fp-height">
@@ -189,24 +191,24 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Edge of an excavation</span></div>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Ladder or scaffold</span></div>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Boom lift, scissor lift or other elevating platform</span></div>
-  <div class="chk" data-group="hazard"><input type="checkbox"><span>Leading edge / framing walls</span></div>
+  <div class="chk" data-group="hazard"><input type="checkbox"><span>Edge of a wall you are building (framing)</span></div>
   <div class="chk chk-other" data-group="hazard"><input type="checkbox"><span>Other: <input type="text" class="other-txt" placeholder="describe"></span></div>
 
   <label class="f">How are you protected? Pick only what you are using for this task (at least 1)</label>
   <div class="chk" data-group="system"><input type="checkbox"><span>Guardrails</span></div>
-  <div class="chk" data-group="system"><input type="checkbox"><span>Full-body harness and lanyard, tied off to an approved anchor (min. 3.5 kN)</span></div>
+  <div class="chk" data-group="system"><input type="checkbox"><span>Full-body harness and lanyard, hooked to a strong anchor point (at least 3.5 kN)</span></div>
   <div class="chk" data-group="system"><input type="checkbox"><span>Self-retracting lifeline (SRL)</span></div>
-  <div class="chk" data-group="system"><input type="checkbox"><span>Boom lift: harness tied to the anchor point on the platform (OHS 13.33)</span></div>
-  <div class="chk" data-group="system"><input type="checkbox"><span>Scissor lift: guardrails and chains in place, on firm level ground</span></div>
-  <div class="chk" data-group="system"><input type="checkbox"><span>Control zone: I stay at least 2 m from the edge and a safety monitor watches me</span></div>
-  <div class="chk" data-group="system"><input type="checkbox"><span>Openings are covered, secured and marked</span></div>
+  <div class="chk" data-group="system"><input type="checkbox"><span>Boom lift: harness hooked to the anchor point on the platform</span></div>
+  <div class="chk" data-group="system"><input type="checkbox"><span>Scissor lift: guardrails and chains up, on flat solid ground</span></div>
+  <div class="chk" data-group="system"><input type="checkbox"><span>I stay at least 2 m back from the edge, and someone watches me (safety monitor)</span></div>
+  <div class="chk" data-group="system"><input type="checkbox"><span>Holes are covered, fixed down, and marked</span></div>
   <div class="chk chk-other" data-group="system"><input type="checkbox"><span>Other: <input type="text" class="other-txt" placeholder="describe"></span></div>
 
-  <div class="statement"><strong>If someone falls</strong>
-  If a worker is hanging in their harness: call 911 and the first aid attendant, keep talking to them, and get them down fast with what you have on site — only if it is safe for you. Never leave them alone.</div>
+  <div class="statement"><span class="stlabel">If someone falls</span>
+  If a worker is hanging in their harness: <strong>call 911</strong> and call the first aid person. Keep talking to them. Get them down fast, using what you have — only if it is safe for you. <strong>Never leave them alone.</strong></div>
 
-  <div class="statement"><strong>Your equipment and training</strong>
-  You checked your harness, lanyard and anchor before using them. Everyone signing below knows how to use the system chosen above.</div>
+  <div class="statement"><span class="stlabel">Your equipment and training</span>
+  You checked your harness, lanyard, and anchor before you used them. Everyone who signs below knows how to use the system marked above.</div>
 </div>
 </section>
 
@@ -216,8 +218,8 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   <h2>Hot Work Permit</h2>
   <p class="sub">Valid for today only, at the location above. Welding, cutting, grinding, torch work.</p>
 
-  <div class="statement"><strong>Cut-off time</strong>
-  No hot work after 2:30 p.m. Shut off all torches and tools by 2:30 p.m.</div>
+  <div class="statement"><span class="stlabel">Cut-off time</span>
+  <strong>No hot work after 2:30 p.m.</strong> Turn off all torches and tools by 2:30 p.m.</div>
 
   <label class="f">What are you doing?</label>
   <select id="hw-type">
@@ -238,15 +240,15 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   <label class="f">Who is your fire watch?</label>
   <input type="text" id="hw-firewatch" placeholder="Full name">
 
-  <label class="f">Before you start — you must confirm every one</label>
-  <div class="chk" data-req="1"><input type="checkbox"><span>Everything that can burn is moved well clear of my work — or, if it cannot be moved, covered with a fire blanket or shield (wood, garbage, tarps, fuel, gas cylinders, propane tanks).</span></div>
+  <label class="f">Before you start — check every box. All must be true</label>
+  <div class="chk" data-req="1"><input type="checkbox"><span>Everything that can burn is far from my work — wood, garbage, tarps, fuel, gas cylinders, propane tanks. If I could not move it, I covered it with a fire blanket or shield.</span></div>
   <div class="chk" data-req="1"><input type="checkbox"><span>I have a charged ABC fire extinguisher next to me, within reach.</span></div>
-  <div class="chk" data-req="1"><input type="checkbox"><span>I covered or blocked any floor or wall openings near me so sparks cannot fall through.</span></div>
+  <div class="chk" data-req="1"><input type="checkbox"><span>I covered or blocked any holes in the floor or wall near me, so sparks cannot fall through.</span></div>
   <div class="chk" data-req="1"><input type="checkbox"><span>I did the WDC site orientation and I am trained for this hot work.</span></div>
-  <div class="chk" data-req="1"><input type="checkbox"><span>My fire watch stays with me while I work and for 2 hours after I stop — including my breaks and lunch. If they have to leave, someone else takes over first.</span></div>
+  <div class="chk" data-req="1"><input type="checkbox"><span>My fire watch stays with me while I work, and for 2 hours after I stop — even during breaks and lunch. If they must leave, another trained person takes over first.</span></div>
 
-  <div class="statement"><strong>While you work</strong>
-  If something that can burn cannot be moved or covered, do not do the hot work there — move the work or use a tool that makes no sparks. If anything changes, stop. When you finish, mark hot metal “HOT”. If there is a fire: call 911 right away, and use the extinguisher only if it is safe for you.</div>
+  <div class="statement"><span class="stlabel">While you work</span>
+  If you cannot move or cover something that can burn, <strong>do not work there</strong> — move to a new spot, or use a tool with no sparks. If anything changes, <strong>stop work</strong>. When you finish, mark hot metal "HOT". If there is a fire: <strong>call 911 right away</strong>. Use the extinguisher only if it is safe for you.</div>
 </div>
 </section>
 
@@ -283,16 +285,16 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   </select>
   <input type="text" id="si-respOther" class="hidden" placeholder="Describe the respirator" style="margin-top:8px">
 
-  <div class="statement"><strong>While you work</strong>
-  Use your controls the whole time. Wear your respirator properly — no beard where it seals. If you see dust escaping, stop and fix it. Wash your hands before you eat or drink.</div>
+  <div class="statement"><span class="stlabel">While you work</span>
+  Use your dust controls the whole time. Wear your respirator the right way — no beard where it touches your face. If you see dust in the air, <strong>stop and fix it</strong>. Wash your hands before you eat or drink.</div>
 </div>
 </section>
 
 <!-- ================= SIGNATURES ================= -->
 <div class="card" id="sigcard">
   <h2>Signatures</h2>
-  <div class="statement" id="decl"><strong>Declaration</strong>
-  By signing, I confirm everything I checked above is true and in place right now. Work without these controls is not permitted on WDC sites and will be stopped.</div>
+  <div class="statement" id="decl"><span class="stlabel">Declaration</span>
+  By signing, I say that everything I checked above is true and ready right now. <strong>Work without these controls is not allowed on WDC sites and will be stopped.</strong></div>
   <div id="sigs"></div>
   <button class="addsig" id="addSig">+ Add another signature</button>
   <div id="sigsPrint" class="print-only">
@@ -533,12 +535,22 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
       var ot=row.querySelector('.other-txt');
       checks.push([row.querySelector('input').checked, ot?('Other: '+ot.value.trim()):row.querySelector('span').textContent]);
     });
+    function richRuns(st){
+      var label=st.querySelector('.stlabel');
+      var runs=[];
+      st.childNodes.forEach(function(n){
+        if(n===label) return;
+        if(n.nodeType===1 && n.tagName==='STRONG'){
+          n.textContent.split(/\s+/).forEach(function(w){ if(w) runs.push({t:w,b:true}); });
+        } else if(n.nodeType===3 || n.nodeType===1){
+          (n.textContent||'').split(/\s+/).forEach(function(w){ if(w) runs.push({t:w,b:false}); });
+        }
+      });
+      return [label?label.textContent:'', runs];
+    }
     var statements=[];
-    form.querySelectorAll('.statement').forEach(function(st){
-      var strong=st.querySelector('strong');
-      statements.push([strong.textContent, st.textContent.replace(strong.textContent,'').trim()]);
-    });
-    statements.push(['Declaration', document.querySelector('#decl').textContent.replace('Declaration','').trim()]);
+    form.querySelectorAll('.statement').forEach(function(st){ statements.push(richRuns(st)); });
+    statements.push(richRuns(document.querySelector('#decl')));
     var sigsArr=[];
     document.querySelectorAll('#sigs .sig-block').forEach(function(bl){
       var name=bl.querySelector('input').value.trim();
@@ -596,13 +608,30 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
       y-=lines.length*12+6;
     });
     y-=6;
-    // statements with green side rule
+    // statements with green side rule -- words wrap, bold runs stay bold
+    function wrapRuns(runs,maxChars){
+      var lines=[],cur=[],len=0;
+      runs.forEach(function(w){
+        var wl=w.t.length+1;
+        if(len+wl>maxChars && cur.length){ lines.push(cur); cur=[]; len=0; }
+        cur.push(w); len+=wl;
+      });
+      if(cur.length) lines.push(cur);
+      return lines;
+    }
     d.statements.forEach(function(st){
-      var lines=wrap(st[1],92);
+      var lines=wrapRuns(st[1],92);
       var blockH=14+lines.length*11;
       c+=GREEN+' rg '+M+' '+(y-blockH+8)+' 2 '+blockH+' re f\n';
       txt(st[0].toUpperCase(),8,M+10,y,BLUE,true); y-=13;
-      lines.forEach(function(ln){ txt(ln,8.5,M+10,y,GREY,false); y-=11; });
+      lines.forEach(function(line){
+        var x=M+10;
+        line.forEach(function(w){
+          txt(w.t,8.5,x,y,w.b?DARK:GREY,w.b);
+          x += w.t.length*(w.b?4.9:4.6)+3.4;
+        });
+        y-=11;
+      });
       y-=10;
     });
     // signatures
