@@ -49,6 +49,7 @@ textarea{min-height:70px}
 .statement strong{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
 
 .sig-block{margin-top:10px}
+.print-only{display:none}
 canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8px;background:#ffffff;touch-action:none;display:block}
 .sig-row{display:flex;gap:8px;margin-top:6px}
 .sig-row input{flex:1}
@@ -99,11 +100,14 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   .statement strong{font-size:6.5pt}
   .meta{font-size:7.5pt}
   #sigcard .sub{display:none}
-  #sigs{display:flex;flex-wrap:wrap;gap:2mm}
-  .sig-block{width:48%;margin-top:0}
-  canvas.sig{height:14mm}
-  .sig-row{margin-top:0.5mm}
-  .sig-row input{font-size:8pt}
+  #sigs,.sig-block{display:none !important}
+  .print-only{display:block}
+  #sigsPrint{margin-top:1mm}
+  .ps-row{display:flex;gap:6mm;padding:1.3mm 0;border-bottom:0.5px solid #bbb}
+  .ps-row.ps-head{border-bottom:1px solid #000;padding-bottom:1mm}
+  .ps-head span{font-size:6.5pt;text-transform:uppercase;letter-spacing:.03em;color:#444;font-weight:700}
+  .ps-name{flex:1.3}
+  .ps-sig{flex:1}
 }
 </style>
 </head>
@@ -283,6 +287,15 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   By signing, I confirm everything I checked above is true and in place right now. Work without these controls is not permitted on WDC sites and will be stopped.</div>
   <div id="sigs"></div>
   <button class="addsig" id="addSig">+ Add another signature</button>
+  <div id="sigsPrint" class="print-only">
+    <div class="ps-row ps-head"><span class="ps-name">Printed Name</span><span class="ps-sig">Signature</span></div>
+  <div class="ps-row"><span class="ps-name">&nbsp;</span><span class="ps-sig">&nbsp;</span></div>
+  <div class="ps-row"><span class="ps-name">&nbsp;</span><span class="ps-sig">&nbsp;</span></div>
+  <div class="ps-row"><span class="ps-name">&nbsp;</span><span class="ps-sig">&nbsp;</span></div>
+  <div class="ps-row"><span class="ps-name">&nbsp;</span><span class="ps-sig">&nbsp;</span></div>
+  <div class="ps-row"><span class="ps-name">&nbsp;</span><span class="ps-sig">&nbsp;</span></div>
+  <div class="ps-row"><span class="ps-name">&nbsp;</span><span class="ps-sig">&nbsp;</span></div>
+  </div>
 </div>
 
 <div id="missing" class="hidden"></div>
@@ -407,7 +420,8 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 
   // ---- completeness check: a permit is either complete or it does not exist ----
   function val(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
-  function validate(){
+  function validate(opts){
+    opts=opts||{};
     var active=document.querySelector('.tabs button.active').dataset.tab;
     var form=document.getElementById('form-'+active);
     var miss=[];
@@ -442,7 +456,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     document.querySelectorAll('#sigs .sig-block').forEach(function(bl){
       if(bl.querySelector('canvas').dataset.drawn && bl.querySelector('input').value.trim()) signed=true;
     });
-    if(!signed) miss.push('At least 1 signature with printed name');
+    if(!signed && opts.requireSignature!==false) miss.push('At least 1 signature with printed name');
     var st=document.getElementById('status');
     st.className=miss.length?'bad':'ok';
     st.textContent=miss.length?'PERMIT INCOMPLETE — DO NOT START':'PERMIT COMPLETE — sign and send to Safety';
@@ -457,8 +471,8 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   document.querySelectorAll('.tabs button').forEach(function(b){ b.addEventListener('click',function(){ setTimeout(validate,0); }); });
   setTimeout(validate,0);
 
-  function gate(then){
-    var miss=validate();
+  function gate(then,opts){
+    var miss=validate(opts);
     if(miss.length){
       var mb=document.getElementById('missing');
       mb.classList.remove('hidden');
@@ -473,7 +487,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     ov.querySelector('#ovNo').addEventListener('click',function(){ov.remove();});
     ov.querySelector('#ovYes').addEventListener('click',function(){ov.remove();then();});
   }
-  document.getElementById('btnPrint').addEventListener('click',function(){ gate(function(){ window.print(); }); });
+  document.getElementById('btnPrint').addEventListener('click',function(){ gate(function(){ window.print(); },{requireSignature:false}); });
   // ---- build a real PDF (text + signature images) and share it ----
   function pdfEscape(t){return t.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[^\x20-\x7e]/g,' ');}
   function collectData(){
