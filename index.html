@@ -50,6 +50,8 @@ textarea{min-height:70px}
 
 .sig-block{margin-top:10px}
 .print-only{display:none}
+.printmode{display:flex;align-items:flex-start;gap:8px;margin:0 16px 90px;padding:12px;border:1px dashed var(--line);border-radius:8px;font-size:.85rem;color:var(--muted)}
+.printmode input{width:20px;height:20px;margin-top:1px;accent-color:var(--accent);flex-shrink:0}
 canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8px;background:#ffffff;touch-action:none;display:block}
 .sig-row{display:flex;gap:8px;margin-top:6px}
 .sig-row input{flex:1}
@@ -79,7 +81,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 
 @media print{
   @page{margin:8mm}
-  .tabs,.printbar,.addsig,.sig-row button,#status,#missing{display:none !important}
+  .tabs,.printbar,.addsig,.sig-row button,#status,#missing,.printmode{display:none !important}
   body{background:#fff;color:#000;padding:0;font-size:8pt;line-height:1.2}
   :root{--card:#fff;--field:#fff;--ink:#000;--muted:#444;--line:#999;--bg:#fff}
   section.form.hidden{display:none}
@@ -100,8 +102,13 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   .statement strong{font-size:6.5pt}
   .meta{font-size:7.5pt}
   #sigcard .sub{display:none}
-  #sigs,.sig-block{display:none !important}
-  .print-only{display:block}
+  #sigs{display:flex;flex-wrap:wrap;gap:2mm}
+  .sig-block{width:48%;margin-top:0}
+  canvas.sig{height:14mm}
+  .sig-row{margin-top:0.5mm}
+  .sig-row input{font-size:8pt}
+  body.print-blank #sigs,body.print-blank .sig-block{display:none !important}
+  body.print-blank .print-only{display:block}
   #sigsPrint{margin-top:1mm}
   .ps-row{display:flex;gap:6mm;padding:1.3mm 0;border-bottom:0.5px solid #bbb}
   .ps-row.ps-head{border-bottom:1px solid #000;padding-bottom:1mm}
@@ -300,6 +307,8 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 
 <div id="missing" class="hidden"></div>
 
+<label class="printmode"><input type="checkbox" id="blankSigMode"> Print blank signature lines (foreman collects on paper) instead of the digital ones above</label>
+
 </div><!-- /wrap -->
 
 <div class="printbar">
@@ -487,6 +496,9 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     ov.querySelector('#ovNo').addEventListener('click',function(){ov.remove();});
     ov.querySelector('#ovYes').addEventListener('click',function(){ov.remove();then();});
   }
+  document.getElementById('blankSigMode').addEventListener('change',function(){
+    document.body.classList.toggle('print-blank', this.checked);
+  });
   document.getElementById('btnPrint').addEventListener('click',function(){ gate(function(){ window.print(); },{requireSignature:false}); });
   // ---- build a real PDF (text + signature images) and share it ----
   function pdfEscape(t){return t.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[^\x20-\x7e]/g,' ');}
