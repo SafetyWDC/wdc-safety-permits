@@ -145,6 +145,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   <label class="f">Company doing the work</label>
   <select id="contractor">
     <option value="" disabled selected>Select your company…</option>
+    <option>AMC</option>
     <option>AWSE</option>
     <option>Bjordal</option>
     <option>Blacktail Reinforcing</option>
@@ -174,7 +175,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
 <section class="form" id="form-fall">
 <div class="card">
   <h2>Site-Specific Fall Protection Plan</h2>
-  <p class="sub">WorkSafeBC OHS Reg. Part 11. Needed from 3 m (10 ft); written plan from 7.5 m (25 ft).</p>
+  <p class="sub">WorkSafeBC OHS Reg. Part 11. Needed from 3 m (10 ft); written plan from 7.5 m (25 ft). Covers this task — review it again if the work or the hazards change.</p>
 
   <label class="f">How high are you working?</label>
   <select id="fp-height">
@@ -182,7 +183,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     <option>Over 7.5 m (25 ft) — written plan required</option>
   </select>
 
-  <label class="f">Where could you fall today? Pick only what is true for your work (at least 1)</label>
+  <label class="f">Where could you fall on this task? Pick only what is true for your work (at least 1)</label>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Open edge of a floor or roof</span></div>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Hole or opening in a floor or roof</span></div>
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Edge of an excavation</span></div>
@@ -191,7 +192,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   <div class="chk" data-group="hazard"><input type="checkbox"><span>Leading edge / framing walls</span></div>
   <div class="chk chk-other" data-group="hazard"><input type="checkbox"><span>Other: <input type="text" class="other-txt" placeholder="describe"></span></div>
 
-  <label class="f">How are you protected? Pick only what you are using today (at least 1)</label>
+  <label class="f">How are you protected? Pick only what you are using for this task (at least 1)</label>
   <div class="chk" data-group="system"><input type="checkbox"><span>Guardrails</span></div>
   <div class="chk" data-group="system"><input type="checkbox"><span>Full-body harness and lanyard, tied off to an approved anchor (min. 3.5 kN)</span></div>
   <div class="chk" data-group="system"><input type="checkbox"><span>Self-retracting lifeline (SRL)</span></div>
@@ -205,7 +206,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   If a worker is hanging in their harness: call 911 and the first aid attendant, keep talking to them, and get them down fast with what you have on site — only if it is safe for you. Never leave them alone.</div>
 
   <div class="statement"><strong>Your equipment and training</strong>
-  You checked your harness, lanyard and anchor before using them today. Everyone signing below knows how to use the system chosen above.</div>
+  You checked your harness, lanyard and anchor before using them. Everyone signing below knows how to use the system chosen above.</div>
 </div>
 </section>
 
@@ -238,7 +239,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   <input type="text" id="hw-firewatch" placeholder="Full name">
 
   <label class="f">Before you start — you must confirm every one</label>
-  <div class="chk" data-req="1"><input type="checkbox"><span>Everything that can burn within 11 m (35 ft) of my work is moved away — or, if it cannot be moved, covered with a fire blanket or shield (wood, garbage, tarps, fuel, gas cylinders, propane tanks).</span></div>
+  <div class="chk" data-req="1"><input type="checkbox"><span>Everything that can burn is moved well clear of my work — or, if it cannot be moved, covered with a fire blanket or shield (wood, garbage, tarps, fuel, gas cylinders, propane tanks).</span></div>
   <div class="chk" data-req="1"><input type="checkbox"><span>I have a charged ABC fire extinguisher next to me, within reach.</span></div>
   <div class="chk" data-req="1"><input type="checkbox"><span>I covered or blocked any floor or wall openings near me so sparks cannot fall through.</span></div>
   <div class="chk" data-req="1"><input type="checkbox"><span>I did the WDC site orientation and I am trained for this hot work.</span></div>
