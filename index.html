@@ -50,6 +50,7 @@ textarea{min-height:70px}
 .statement strong{font-weight:800}
 
 .sig-block{margin-top:10px}
+.sig-print-img,.sig-print-name{display:none}
 .print-only{display:none}
 .printmode{display:flex;align-items:flex-start;gap:8px;margin:0 16px 90px;padding:12px;border:1px dashed var(--line);border-radius:8px;font-size:.85rem;color:var(--muted)}
 .printmode input{width:20px;height:20px;margin-top:1px;accent-color:var(--accent);flex-shrink:0}
@@ -106,15 +107,15 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   #sigcard .sub{display:none}
   #sigs{display:flex;flex-wrap:wrap;gap:2mm}
   .sig-block{width:48%;margin-top:0}
-  canvas.sig{height:14mm}
-  .sig-row{margin-top:0.5mm}
-  .sig-row input{font-size:8pt}
+  canvas.sig,.sig-row{display:none !important}
+  .sig-print-img{display:block !important;height:14mm;max-width:100%;object-fit:contain;border:1px solid #999}
+  .sig-print-name{display:block !important;font-size:8pt;margin-top:1mm;border-top:0.5px solid #999;padding-top:0.5mm}
   body.print-blank #sigs,body.print-blank .sig-block{display:none !important}
   body.print-blank .print-only{display:block}
   #sigsPrint{margin-top:1mm}
-  .ps-row{display:flex;gap:6mm;padding:1.3mm 0;border-bottom:0.5px solid #bbb}
-  .ps-row.ps-head{border-bottom:1px solid #000;padding-bottom:1mm}
-  .ps-head span{font-size:6.5pt;text-transform:uppercase;letter-spacing:.03em;color:#444;font-weight:700}
+  .ps-row{display:flex;gap:6mm;align-items:flex-end;padding:2.4mm 0;border-bottom:1.5pt solid #000}
+  .ps-row.ps-head{border-bottom:1.5pt solid #000;padding-bottom:1mm;align-items:baseline}
+  .ps-head span{font-size:7.5pt;text-transform:uppercase;letter-spacing:.03em;color:#000;font-weight:700}
   .ps-name{flex:1.3}
   .ps-sig{flex:1}
 }
@@ -352,48 +353,78 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     document.getElementById('contractorOther').classList.toggle('hidden',this.value!=='other');
   });
 
-  // signatures
+  // ---- local persistence (never cleared on init) ----
+  var KEY='wdcPermits.v1';
+  var saved={};
+  try{ saved=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ saved={}; }
+  function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(saved)); }catch(e){} }
+
+  // signatures -- name + drawn image are saved on every change, and a plain
+  // <img>/<div> copy is kept ready for printing (Safari can fail to print a
+  // live <canvas>, so print always uses this image copy instead).
   var sigs=document.getElementById('sigs'), count=0;
-  function addSig(){
+  function persistSigs(){
+    var arr=[];
+    document.querySelectorAll('#sigs .sig-block').forEach(function(bl){
+      var name=bl.querySelector('.sig-name-input').value;
+      var c=bl.querySelector('canvas');
+      var img=c.dataset.drawn?c.toDataURL('image/png'):'';
+      if(name || img) arr.push({name:name,img:img});
+    });
+    saved.sigs=arr; persist();
+  }
+  function addSig(savedName,savedImg){
     count++;
     var wrap=document.createElement('div');
     wrap.className='sig-block';
-    wrap.innerHTML='<canvas class="sig"></canvas>'+
-      '<div class="sig-row"><input type="text" placeholder="Print name"><button type="button">Clear</button></div>';
+    wrap.innerHTML='<canvas class="sig"></canvas><img class="sig-print-img">'+
+      '<div class="sig-row"><input type="text" class="sig-name-input" placeholder="Print name"><button type="button">Clear</button></div>'+
+      '<div class="sig-print-name"></div>';
     sigs.appendChild(wrap);
     var c=wrap.querySelector('canvas'), ctx=c.getContext('2d'), drawing=false;
+    var nameInput=wrap.querySelector('.sig-name-input');
+    var printImg=wrap.querySelector('.sig-print-img');
+    var printName=wrap.querySelector('.sig-print-name');
+    var cssW=0, cssH=120;
     function resize(){
       var r=c.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
-      var img=c.width?c.toDataURL():null;
+      cssW=r.width; cssH=120;
       c.width=r.width*dpr; c.height=120*dpr; ctx.scale(dpr,dpr);
       ctx.lineWidth=3; ctx.lineCap='round'; ctx.lineJoin='round';
       ctx.strokeStyle='#003D52';
     }
     resize();
+    function syncPrintCopy(){
+      printImg.src=c.dataset.drawn?c.toDataURL('image/png'):'';
+      printName.textContent=nameInput.value||'';
+    }
+    if(savedName){ nameInput.value=savedName; }
+    if(savedImg){
+      var im=new Image();
+      im.onload=function(){ ctx.drawImage(im,0,0,cssW,cssH); c.dataset.drawn='1'; syncPrintCopy(); validate(); };
+      im.src=savedImg;
+    }
+    syncPrintCopy();
     function pos(e){
       var r=c.getBoundingClientRect();
       var t=e.touches?e.touches[0]:e;
       return {x:t.clientX-r.left,y:t.clientY-r.top};
     }
     function start(e){e.preventDefault();drawing=true;var p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);}
-    function move(e){if(!drawing)return;e.preventDefault();var p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();c.dataset.drawn='1';validate();}
+    function move(e){if(!drawing)return;e.preventDefault();var p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();c.dataset.drawn='1';syncPrintCopy();persistSigs();validate();}
     function end(){drawing=false;}
     c.addEventListener('pointerdown',start);
     c.addEventListener('pointermove',move);
     window.addEventListener('pointerup',end);
+    nameInput.addEventListener('input',function(){ syncPrintCopy(); persistSigs(); });
     wrap.querySelector('button').addEventListener('click',function(){
-      ctx.clearRect(0,0,c.width,c.height); delete c.dataset.drawn; validate();
+      ctx.clearRect(0,0,c.width,c.height); delete c.dataset.drawn; syncPrintCopy(); persistSigs(); validate();
     });
   }
-  addSig(); addSig(); addSig();
-  document.getElementById('addSig').addEventListener('click',addSig);
-
-
-  // ---- local persistence (never cleared on init) ----
-  var KEY='wdcPermits.v1';
-  var saved={};
-  try{ saved=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ saved={}; }
-  function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(saved)); }catch(e){} }
+  var savedSigs=saved.sigs||[];
+  if(savedSigs.length){ savedSigs.forEach(function(sg){ addSig(sg.name,sg.img); }); }
+  else { addSig(); addSig(); addSig(); }
+  document.getElementById('addSig').addEventListener('click',function(){ addSig(); });
 
   var contractorSel=document.getElementById('contractor');
   var otherInput=document.getElementById('contractorOther');
@@ -412,6 +443,27 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     if(el && !skip && saved[id]!=null){ el.value=saved[id]; if(el.tagName==='SELECT' && el.selectedIndex<0){ el.selectedIndex=0; saved[id]=el.value; } }
     if(el) el.addEventListener('change',function(){ saved[id]=el.value; persist(); });
     if(el && (el.tagName==='TEXTAREA'||el.type==='text')) el.addEventListener('input',function(){ saved[id]=el.value; persist(); });
+  });
+
+  // restore + save every checkbox (and its "Other" free-text) so nothing
+  // typed or checked is ever lost, even if the tab reloads mid-fill
+  function chkKey(row){
+    var sec=row.closest('section').id;
+    var grp=row.dataset.group||row.dataset.req||'x';
+    return 'chk:'+sec+':'+grp+':'+row.querySelector('span').textContent.trim();
+  }
+  document.querySelectorAll('.chk').forEach(function(row){
+    var cb=row.querySelector('input[type=checkbox]');
+    if(!cb) return;
+    var key=chkKey(row);
+    if(saved[key]) cb.checked=true;
+    cb.addEventListener('change',function(){ saved[key]=cb.checked; persist(); });
+    var ot=row.querySelector('.other-txt');
+    if(ot){
+      var okey=key+':txt';
+      if(saved[okey]!=null) ot.value=saved[okey];
+      ot.addEventListener('input',function(){ saved[okey]=ot.value; persist(); });
+    }
   });
 
   // when "Other" gets a name, save it as a permanent option on this device
@@ -568,7 +620,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
   function buildPdf(d){
     var W=612,H=792,M=48;
     var BLUE='0 0.239 0.322', GREEN='0.588 0.776 0.11', GREY='0.25 0.29 0.31', DARK='0 0 0';
-    var c='', y;
+    var pages=[], c='', y;
     function esc(t){return pdfEscape(t);}
     function txt(t,size,x,yy,color,bold){
       c+=color+' rg BT /'+(bold?'F2':'F1')+' '+size+' Tf '+x+' '+yy+' Td ('+esc(t)+') Tj ET\n';
@@ -582,6 +634,17 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
       if(acc) out.push(acc);
       return out;
     }
+    // starts a fresh page whenever the next block would run past the bottom
+    // margin -- nothing (checklist rows, statements, signatures) is ever
+    // silently dropped off the page
+    function ensure(space){
+      if(y-space<M){
+        pages.push(c); c='';
+        y=H-M;
+        txt(d.title+' -- continued',8,M,y,GREY,false);
+        y-=18;
+      }
+    }
     // header: blue text on white + thin green rule only (no ink-heavy fills)
     txt('WHISTLER 2020 DEVELOPMENT CORP',10,M,H-40,BLUE,true);
     txt(d.title,16,M,H-60,BLUE,true);
@@ -590,17 +653,19 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     y=H-106;
     // info rows: label on its own line, value stacked below (never collides regardless of label length)
     d.rows.forEach(function(r){
+      var lines=wrap(r[1]||'-',95);
+      ensure(11+lines.length*13+7);
       txt(r[0].toUpperCase(),7,M,y,GREY,true);
       y-=11;
-      var lines=wrap(r[1]||'-',95);
       lines.forEach(function(ln,i){ txt(ln,10.5,M,y-(i*13),DARK,false); });
       y-=lines.length*13+7;
     });
     y-=6;
     // checklist
-    txt('CHECKLIST',9,M,y,BLUE,true); y-=16;
+    ensure(24); txt('CHECKLIST',9,M,y,BLUE,true); y-=16;
     d.checks.forEach(function(ck){
       var lines=wrap(ck[1],86);
+      ensure(lines.length*12+6);
       if(ck[0]){ c+=GREEN+' rg '+M+' '+(y-2)+' 9 9 re f\n'; }
       else { c+='0.7 0.75 0.77 RG 0.8 w '+M+' '+(y-2)+' 9 9 re S\n'; }
       lines.forEach(function(ln,i){ txt(ln,9.5,M+16,y-(i*12),DARK,false); });
@@ -621,6 +686,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     d.statements.forEach(function(st){
       var lines=wrapRuns(st[1],92);
       var blockH=14+lines.length*11;
+      ensure(blockH+10);
       c+=GREEN+' rg '+M+' '+(y-blockH+8)+' 2 '+blockH+' re f\n';
       txt(st[0].toUpperCase(),8,M+10,y,BLUE,true); y-=13;
       lines.forEach(function(line){
@@ -633,30 +699,41 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
       });
       y-=10;
     });
-    // signatures
-    txt('SIGNATURES',9,M,y,BLUE,true); y-=14;
+    // signatures -- always gets its own room; a full row never gets dropped
+    ensure(30); txt('SIGNATURES',9,M,y,BLUE,true); y-=14;
     var imgs=[];
     var x=M, colW=250;
-    d.sigs.forEach(function(sg,i){
+    d.sigs.forEach(function(sg){
       var iw=230, ih=68;
       if(x+iw>W-M){ x=M; y-=ih+30; }
-      if(y-ih<40) return;
+      if(y-ih<M){ pages.push(c); c=''; y=H-M; x=M;
+        txt(d.title+' -- continued',8,M,y,GREY,false); y-=18;
+        txt('SIGNATURES (cont.)',9,M,y,BLUE,true); y-=14;
+      }
       c+='q '+iw+' 0 0 '+ih+' '+x+' '+(y-ih)+' cm /Im'+imgs.length+' Do Q\n';
       c+='0.7 0.75 0.77 RG 0.8 w '+x+' '+(y-ih)+' '+iw+' '+ih+' re S\n';
       txt(sg.name,9,x,y-ih-12,DARK,false);
       imgs.push({bin:atob(sg.jpeg.split(',')[1]), pw:sg.pw, ph:sg.ph});
       x+=colW;
     });
-    // footer
+    // footer on the last page only
     c+=GREEN+' rg '+M+' 30 '+(W-2*M)+' 1.5 re f\n';
     txt('Send to Safety: text 604-906-0247  |  safety@wdc2020corp.com',7.5,M,18,GREY,false);
+    pages.push(c);
+
+    var N=pages.length;
+    var pageObjStart=3, contentObjStart=pageObjStart+N, fontF1=contentObjStart+N, fontF2=fontF1+1, imgObjStart=fontF2+1;
     var objs=[];
     objs.push('<< /Type /Catalog /Pages 2 0 R >>');
-    objs.push('<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
-    var xo='';
-    imgs.forEach(function(_,i){xo+='/Im'+i+' '+(7+i)+' 0 R ';});
-    objs.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+W+' '+H+'] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> /XObject << '+xo+'>> >> /Contents 4 0 R >>');
-    objs.push('<< /Length '+c.length+' >>\nstream\n'+c+'endstream');
+    var kids=[]; for(var i=0;i<N;i++) kids.push((pageObjStart+i)+' 0 R');
+    objs.push('<< /Type /Pages /Kids ['+kids.join(' ')+'] /Count '+N+' >>');
+    var xo=''; imgs.forEach(function(_,i){xo+='/Im'+i+' '+(imgObjStart+i)+' 0 R ';});
+    for(var i=0;i<N;i++){
+      objs.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+W+' '+H+'] /Resources << /Font << /F1 '+fontF1+' 0 R /F2 '+fontF2+' 0 R >> /XObject << '+xo+'>> >> /Contents '+(contentObjStart+i)+' 0 R >>');
+    }
+    for(var i=0;i<N;i++){
+      objs.push('<< /Length '+pages[i].length+' >>\nstream\n'+pages[i]+'endstream');
+    }
     objs.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
     objs.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>');
     imgs.forEach(function(im){
@@ -672,6 +749,7 @@ canvas.sig{width:100%;height:120px;border:1px dashed var(--line);border-radius:8
     for(var i=0;i<out.length;i++) bytes[i]=out.charCodeAt(i)&0xff;
     return bytes;
   }
+
   document.getElementById('btnEmail').addEventListener('click',function(){ gate(sendPdf); });
   function showPdfOverlay(blob,fname){
     var url=URL.createObjectURL(blob);
